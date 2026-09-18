@@ -1,0 +1,10 @@
+# Binários do go build / go test -c
+/quickstart
+/examples/quickstart/quickstart
+*.exe
+*.test
+
+# Cobertura e perfis
+*.out
+coverage.*
+*.prof

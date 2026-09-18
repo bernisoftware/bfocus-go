@@ -1,0 +1,3133 @@
+{
+  "version": 1,
+  "api_key": "bf_live_conformance",
+  "sdk_excluded_ops": [
+    "customers.create"
+  ],
+  "sdk_helper_ops": {
+    "customers.list_all": "customers.list",
+    "customers.interactions.list_all": "customers.interactions.list",
+    "release_notes.list_all": "release_notes.list",
+    "kb.articles.list_all": "kb.articles.list"
+  },
+  "cases": [
+    {
+      "id": "customers.upsert/created",
+      "op": "customers.upsert",
+      "args": {
+        "external_id": "ERP 1042",
+        "name": "Padaria Estrela",
+        "email": "contato@padaria.example",
+        "custom_fields": [
+          {
+            "key": "plano",
+            "label": "Plano",
+            "value": "ouro"
+          }
+        ]
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": {
+              "name": "Padaria Estrela",
+              "email": "contato@padaria.example",
+              "custom_fields": [
+                {
+                  "key": "plano",
+                  "label": "Plano",
+                  "value": "ouro"
+                }
+              ]
+            }
+          },
+          "response": {
+            "status": 201,
+            "headers": {},
+            "body": {
+              "code": 201,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "external_id": "ERP 1042",
+                "name": "Padaria Estrela",
+                "document": null,
+                "email": "contato@padaria.example",
+                "phone": null,
+                "website": null,
+                "notes": null,
+                "custom_fields": [
+                  {
+                    "key": "plano",
+                    "label": "Plano",
+                    "type": "text",
+                    "value": "ouro",
+                    "visibility": "interno"
+                  }
+                ],
+                "is_active": true,
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "external_id": "ERP 1042",
+          "name": "Padaria Estrela",
+          "document": null,
+          "email": "contato@padaria.example",
+          "phone": null,
+          "website": null,
+          "notes": null,
+          "custom_fields": [
+            {
+              "key": "plano",
+              "label": "Plano",
+              "type": "text",
+              "value": "ouro",
+              "visibility": "interno"
+            }
+          ],
+          "is_active": true,
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "customers.upsert/null_clears_field",
+      "op": "customers.upsert",
+      "args": {
+        "external_id": "ERP 1042",
+        "phone": null
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": {
+              "phone": null
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "external_id": "ERP 1042",
+                "name": "Padaria Estrela",
+                "document": null,
+                "email": "contato@padaria.example",
+                "phone": null,
+                "website": null,
+                "notes": null,
+                "custom_fields": [
+                  {
+                    "key": "plano",
+                    "label": "Plano",
+                    "type": "text",
+                    "value": "ouro",
+                    "visibility": "interno"
+                  }
+                ],
+                "is_active": true,
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "external_id": "ERP 1042",
+          "name": "Padaria Estrela",
+          "document": null,
+          "email": "contato@padaria.example",
+          "phone": null,
+          "website": null,
+          "notes": null,
+          "custom_fields": [
+            {
+              "key": "plano",
+              "label": "Plano",
+              "type": "text",
+              "value": "ouro",
+              "visibility": "interno"
+            }
+          ],
+          "is_active": true,
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "customers.get/ok",
+      "op": "customers.get",
+      "args": {
+        "external_id": "ERP 1042"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "external_id": "ERP 1042",
+                "name": "Padaria Estrela",
+                "document": null,
+                "email": "contato@padaria.example",
+                "phone": null,
+                "website": null,
+                "notes": null,
+                "custom_fields": [
+                  {
+                    "key": "plano",
+                    "label": "Plano",
+                    "type": "text",
+                    "value": "ouro",
+                    "visibility": "interno"
+                  }
+                ],
+                "is_active": true,
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "external_id": "ERP 1042",
+          "name": "Padaria Estrela",
+          "document": null,
+          "email": "contato@padaria.example",
+          "phone": null,
+          "website": null,
+          "notes": null,
+          "custom_fields": [
+            {
+              "key": "plano",
+              "label": "Plano",
+              "type": "text",
+              "value": "ouro",
+              "visibility": "interno"
+            }
+          ],
+          "is_active": true,
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "customers.get/not_found",
+      "op": "customers.get",
+      "args": {
+        "external_id": "nao-existe"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/nao-existe",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 404,
+            "headers": {},
+            "body": {
+              "code": 404,
+              "data": null,
+              "message": "CUSTOMER_NOT_FOUND",
+              "error": "CUSTOMER_NOT_FOUND",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "not_found",
+          "code": "CUSTOMER_NOT_FOUND",
+          "status": 404,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "customers.list/page",
+      "op": "customers.list",
+      "args": {
+        "q": "padaria",
+        "updated_since": "2026-09-01T00:00:00Z",
+        "page": 2,
+        "page_size": 1
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers",
+            "query": {
+              "q": "padaria",
+              "updated_since": "2026-09-01T00:00:00Z",
+              "page": "2",
+              "page_size": "1"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000002",
+                  "external_id": "ERP 1043",
+                  "name": "Mercado Sol",
+                  "document": null,
+                  "email": "contato@padaria.example",
+                  "phone": null,
+                  "website": null,
+                  "notes": null,
+                  "custom_fields": [],
+                  "is_active": true,
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 2,
+                "page_size": 1,
+                "total": 2,
+                "pages": 2
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "items": [
+            {
+              "id": "00000000-0000-4000-8000-000000000002",
+              "external_id": "ERP 1043",
+              "name": "Mercado Sol",
+              "document": null,
+              "email": "contato@padaria.example",
+              "phone": null,
+              "website": null,
+              "notes": null,
+              "custom_fields": [],
+              "is_active": true,
+              "created_at": "2026-09-13T12:00:00+00:00",
+              "updated_at": "2026-09-13T12:00:00+00:00"
+            }
+          ],
+          "page": 2,
+          "page_size": 1,
+          "total": 2,
+          "pages": 2
+        }
+      }
+    },
+    {
+      "id": "customers.list_all/two_pages",
+      "op": "customers.list_all",
+      "args": {
+        "page_size": 1
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers",
+            "query": {
+              "page": "1",
+              "page_size": "1"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000001",
+                  "external_id": "ERP 1042",
+                  "name": "Padaria Estrela",
+                  "document": null,
+                  "email": "contato@padaria.example",
+                  "phone": null,
+                  "website": null,
+                  "notes": null,
+                  "custom_fields": [
+                    {
+                      "key": "plano",
+                      "label": "Plano",
+                      "type": "text",
+                      "value": "ouro",
+                      "visibility": "interno"
+                    }
+                  ],
+                  "is_active": true,
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 1,
+                "page_size": 1,
+                "total": 2,
+                "pages": 2
+              }
+            }
+          }
+        },
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers",
+            "query": {
+              "page": "2",
+              "page_size": "1"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000002",
+                  "external_id": "ERP 1043",
+                  "name": "Mercado Sol",
+                  "document": null,
+                  "email": "contato@padaria.example",
+                  "phone": null,
+                  "website": null,
+                  "notes": null,
+                  "custom_fields": [],
+                  "is_active": true,
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 2,
+                "page_size": 1,
+                "total": 2,
+                "pages": 2
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "id": "00000000-0000-4000-8000-000000000001",
+            "external_id": "ERP 1042",
+            "name": "Padaria Estrela",
+            "document": null,
+            "email": "contato@padaria.example",
+            "phone": null,
+            "website": null,
+            "notes": null,
+            "custom_fields": [
+              {
+                "key": "plano",
+                "label": "Plano",
+                "type": "text",
+                "value": "ouro",
+                "visibility": "interno"
+              }
+            ],
+            "is_active": true,
+            "created_at": "2026-09-13T12:00:00+00:00",
+            "updated_at": "2026-09-13T12:00:00+00:00"
+          },
+          {
+            "id": "00000000-0000-4000-8000-000000000002",
+            "external_id": "ERP 1043",
+            "name": "Mercado Sol",
+            "document": null,
+            "email": "contato@padaria.example",
+            "phone": null,
+            "website": null,
+            "notes": null,
+            "custom_fields": [],
+            "is_active": true,
+            "created_at": "2026-09-13T12:00:00+00:00",
+            "updated_at": "2026-09-13T12:00:00+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "customers.delete/ok",
+      "op": "customers.delete",
+      "args": {
+        "external_id": "ERP 1042"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "DELETE",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "deleted": true
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "deleted": true
+        }
+      }
+    },
+    {
+      "id": "customers.contacts.list/ok",
+      "op": "customers.contacts.list",
+      "args": {
+        "external_id": "ERP 1042"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042/contacts",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000010",
+                  "external_id": "CT-1",
+                  "name": "Ana Souza",
+                  "role": "Financeiro",
+                  "email": "ana@padaria.example",
+                  "phone": null,
+                  "notes": null,
+                  "is_primary": true,
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "id": "00000000-0000-4000-8000-000000000010",
+            "external_id": "CT-1",
+            "name": "Ana Souza",
+            "role": "Financeiro",
+            "email": "ana@padaria.example",
+            "phone": null,
+            "notes": null,
+            "is_primary": true,
+            "created_at": "2026-09-13T12:00:00+00:00",
+            "updated_at": "2026-09-13T12:00:00+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "customers.contacts.upsert/created",
+      "op": "customers.contacts.upsert",
+      "args": {
+        "external_id": "ERP 1042",
+        "contact_external_id": "CT-1",
+        "name": "Ana Souza",
+        "role": "Financeiro",
+        "email": "ana@padaria.example",
+        "is_primary": true
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/contacts/CT-1",
+            "query": {},
+            "body": {
+              "name": "Ana Souza",
+              "role": "Financeiro",
+              "email": "ana@padaria.example",
+              "is_primary": true
+            }
+          },
+          "response": {
+            "status": 201,
+            "headers": {},
+            "body": {
+              "code": 201,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000010",
+                "external_id": "CT-1",
+                "name": "Ana Souza",
+                "role": "Financeiro",
+                "email": "ana@padaria.example",
+                "phone": null,
+                "notes": null,
+                "is_primary": true,
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000010",
+          "external_id": "CT-1",
+          "name": "Ana Souza",
+          "role": "Financeiro",
+          "email": "ana@padaria.example",
+          "phone": null,
+          "notes": null,
+          "is_primary": true,
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "customers.contacts.upsert/validation",
+      "op": "customers.contacts.upsert",
+      "args": {
+        "external_id": "ERP 1042",
+        "contact_external_id": "CT-2",
+        "name": "Beto",
+        "email": "nao-e-email"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/contacts/CT-2",
+            "query": {},
+            "body": {
+              "name": "Beto",
+              "email": "nao-e-email"
+            }
+          },
+          "response": {
+            "status": 422,
+            "headers": {},
+            "body": {
+              "code": 422,
+              "data": null,
+              "message": "Dados inválidos",
+              "error": "VALIDATION_ERROR",
+              "validation": {
+                "email": "value is not a valid email address"
+              },
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "validation",
+          "code": "VALIDATION_ERROR",
+          "status": 422,
+          "request_id": "req-conformance-01",
+          "validation": {
+            "email": "value is not a valid email address"
+          }
+        }
+      }
+    },
+    {
+      "id": "customers.contacts.delete/ok",
+      "op": "customers.contacts.delete",
+      "args": {
+        "external_id": "ERP 1042",
+        "contact_external_id": "CT-1"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "DELETE",
+            "path": "/api/v1/integration/customers/ERP%201042/contacts/CT-1",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "deleted": true
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "deleted": true
+        }
+      }
+    },
+    {
+      "id": "customers.products.list/ok",
+      "op": "customers.products.list",
+      "args": {
+        "external_id": "ERP 1042"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042/products",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000020",
+                  "slug": "erp-cloud",
+                  "name": "ERP Cloud",
+                  "is_active": true
+                }
+              ],
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "id": "00000000-0000-4000-8000-000000000020",
+            "slug": "erp-cloud",
+            "name": "ERP Cloud",
+            "is_active": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "customers.products.attach/ok",
+      "op": "customers.products.attach",
+      "args": {
+        "external_id": "ERP 1042",
+        "product_slug": "erp-cloud"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/products/erp-cloud",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 201,
+            "headers": {},
+            "body": {
+              "code": 201,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000020",
+                "slug": "erp-cloud",
+                "name": "ERP Cloud",
+                "is_active": true
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000020",
+          "slug": "erp-cloud",
+          "name": "ERP Cloud",
+          "is_active": true
+        }
+      }
+    },
+    {
+      "id": "customers.products.detach/not_linked",
+      "op": "customers.products.detach",
+      "args": {
+        "external_id": "ERP 1042",
+        "product_slug": "erp-cloud"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "DELETE",
+            "path": "/api/v1/integration/customers/ERP%201042/products/erp-cloud",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 404,
+            "headers": {},
+            "body": {
+              "code": 404,
+              "data": null,
+              "message": "PRODUCT_NOT_LINKED",
+              "error": "PRODUCT_NOT_LINKED",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "not_found",
+          "code": "PRODUCT_NOT_LINKED",
+          "status": 404,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "customers.interactions.list/page",
+      "op": "customers.interactions.list",
+      "args": {
+        "external_id": "ERP 1042",
+        "page_size": 20
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042/interactions",
+            "query": {
+              "page_size": "20"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000030",
+                  "content": "<p>Pedido 1042 faturado.</p>",
+                  "is_internal": true,
+                  "author_kind": "human",
+                  "author_name": "Carla Lima",
+                  "created_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 1,
+                "page_size": 20,
+                "total": 1,
+                "pages": 1
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "items": [
+            {
+              "id": "00000000-0000-4000-8000-000000000030",
+              "content": "<p>Pedido 1042 faturado.</p>",
+              "is_internal": true,
+              "author_kind": "human",
+              "author_name": "Carla Lima",
+              "created_at": "2026-09-13T12:00:00+00:00"
+            }
+          ],
+          "page": 1,
+          "page_size": 20,
+          "total": 1,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "customers.interactions.create/ok",
+      "op": "customers.interactions.create",
+      "args": {
+        "external_id": "ERP 1042",
+        "content": "Pedido 1042 faturado.",
+        "author_email": "carla@berni.example"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/customers/ERP%201042/interactions",
+            "query": {},
+            "body": {
+              "content": "Pedido 1042 faturado.",
+              "author_email": "carla@berni.example"
+            }
+          },
+          "response": {
+            "status": 201,
+            "headers": {},
+            "body": {
+              "code": 201,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000030",
+                "content": "<p>Pedido 1042 faturado.</p>",
+                "is_internal": true,
+                "author_kind": "human",
+                "author_name": "Carla Lima",
+                "created_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000030",
+          "content": "<p>Pedido 1042 faturado.</p>",
+          "is_internal": true,
+          "author_kind": "human",
+          "author_name": "Carla Lima",
+          "created_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "products.list/include_inactive",
+      "op": "products.list",
+      "args": {
+        "include_inactive": true
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products",
+            "query": {
+              "include_inactive": "true"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000020",
+                  "slug": "erp-cloud",
+                  "name": "ERP Cloud",
+                  "description": "Gestão na nuvem",
+                  "color": "#6366F1",
+                  "icon": null,
+                  "is_active": true,
+                  "sort_order": 0,
+                  "current_version": "2.3.0",
+                  "ai_level": "autonomous",
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "id": "00000000-0000-4000-8000-000000000020",
+            "slug": "erp-cloud",
+            "name": "ERP Cloud",
+            "description": "Gestão na nuvem",
+            "color": "#6366F1",
+            "icon": null,
+            "is_active": true,
+            "sort_order": 0,
+            "current_version": "2.3.0",
+            "ai_level": "autonomous",
+            "created_at": "2026-09-13T12:00:00+00:00",
+            "updated_at": "2026-09-13T12:00:00+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "products.get/ok",
+      "op": "products.get",
+      "args": {
+        "slug": "erp-cloud"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products/erp-cloud",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000020",
+                "slug": "erp-cloud",
+                "name": "ERP Cloud",
+                "description": "Gestão na nuvem",
+                "color": "#6366F1",
+                "icon": null,
+                "is_active": true,
+                "sort_order": 0,
+                "current_version": "2.3.0",
+                "ai_level": "autonomous",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000020",
+          "slug": "erp-cloud",
+          "name": "ERP Cloud",
+          "description": "Gestão na nuvem",
+          "color": "#6366F1",
+          "icon": null,
+          "is_active": true,
+          "sort_order": 0,
+          "current_version": "2.3.0",
+          "ai_level": "autonomous",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "products.upsert/created",
+      "op": "products.upsert",
+      "args": {
+        "slug": "erp-cloud",
+        "name": "ERP Cloud",
+        "description": "Gestão na nuvem",
+        "color": "#6366F1"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/products/erp-cloud",
+            "query": {},
+            "body": {
+              "name": "ERP Cloud",
+              "description": "Gestão na nuvem",
+              "color": "#6366F1"
+            }
+          },
+          "response": {
+            "status": 201,
+            "headers": {},
+            "body": {
+              "code": 201,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000020",
+                "slug": "erp-cloud",
+                "name": "ERP Cloud",
+                "description": "Gestão na nuvem",
+                "color": "#6366F1",
+                "icon": null,
+                "is_active": true,
+                "sort_order": 0,
+                "current_version": "2.3.0",
+                "ai_level": "autonomous",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000020",
+          "slug": "erp-cloud",
+          "name": "ERP Cloud",
+          "description": "Gestão na nuvem",
+          "color": "#6366F1",
+          "icon": null,
+          "is_active": true,
+          "sort_order": 0,
+          "current_version": "2.3.0",
+          "ai_level": "autonomous",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "products.archive/ok",
+      "op": "products.archive",
+      "args": {
+        "slug": "erp-cloud"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "DELETE",
+            "path": "/api/v1/integration/products/erp-cloud",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000020",
+                "slug": "erp-cloud",
+                "name": "ERP Cloud",
+                "description": "Gestão na nuvem",
+                "color": "#6366F1",
+                "icon": null,
+                "is_active": false,
+                "sort_order": 0,
+                "current_version": "2.3.0",
+                "ai_level": "autonomous",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000020",
+          "slug": "erp-cloud",
+          "name": "ERP Cloud",
+          "description": "Gestão na nuvem",
+          "color": "#6366F1",
+          "icon": null,
+          "is_active": false,
+          "sort_order": 0,
+          "current_version": "2.3.0",
+          "ai_level": "autonomous",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "release_notes.list/published",
+      "op": "release_notes.list",
+      "args": {
+        "product_slug": "erp-cloud",
+        "published": true,
+        "page_size": 20
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products/erp-cloud/release-notes",
+            "query": {
+              "published": "true",
+              "page_size": "20"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000040",
+                  "product": "erp-cloud",
+                  "version": "2.3.0",
+                  "title": "Emissão de NFS-e em lote",
+                  "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+                  "audience": "external",
+                  "is_published": true,
+                  "require_ack_internal": false,
+                  "require_ack_external": false,
+                  "published_at": "2026-09-13T15:30:00+00:00",
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T15:30:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 1,
+                "page_size": 20,
+                "total": 1,
+                "pages": 1
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "items": [
+            {
+              "id": "00000000-0000-4000-8000-000000000040",
+              "product": "erp-cloud",
+              "version": "2.3.0",
+              "title": "Emissão de NFS-e em lote",
+              "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+              "audience": "external",
+              "is_published": true,
+              "require_ack_internal": false,
+              "require_ack_external": false,
+              "published_at": "2026-09-13T15:30:00+00:00",
+              "created_at": "2026-09-13T12:00:00+00:00",
+              "updated_at": "2026-09-13T15:30:00+00:00"
+            }
+          ],
+          "page": 1,
+          "page_size": 20,
+          "total": 1,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "release_notes.get/ok",
+      "op": "release_notes.get",
+      "args": {
+        "product_slug": "erp-cloud",
+        "version": "2.3.0"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products/erp-cloud/release-notes/2.3.0",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000040",
+                "product": "erp-cloud",
+                "version": "2.3.0",
+                "title": "Emissão de NFS-e em lote",
+                "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+                "audience": "external",
+                "is_published": true,
+                "require_ack_internal": false,
+                "require_ack_external": false,
+                "published_at": "2026-09-13T15:30:00+00:00",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T15:30:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000040",
+          "product": "erp-cloud",
+          "version": "2.3.0",
+          "title": "Emissão de NFS-e em lote",
+          "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+          "audience": "external",
+          "is_published": true,
+          "require_ack_internal": false,
+          "require_ack_external": false,
+          "published_at": "2026-09-13T15:30:00+00:00",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T15:30:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "release_notes.upsert/publish_from_ci",
+      "op": "release_notes.upsert",
+      "args": {
+        "product_slug": "erp-cloud",
+        "version": "2.3.0",
+        "title": "Emissão de NFS-e em lote",
+        "description_markdown": "**Novidade**: emita várias notas de uma vez.",
+        "audience": "external",
+        "publish": true
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/products/erp-cloud/release-notes/2.3.0",
+            "query": {},
+            "body": {
+              "title": "Emissão de NFS-e em lote",
+              "description_markdown": "**Novidade**: emita várias notas de uma vez.",
+              "audience": "external",
+              "publish": true
+            }
+          },
+          "response": {
+            "status": 201,
+            "headers": {},
+            "body": {
+              "code": 201,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000040",
+                "product": "erp-cloud",
+                "version": "2.3.0",
+                "title": "Emissão de NFS-e em lote",
+                "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+                "audience": "external",
+                "is_published": true,
+                "require_ack_internal": false,
+                "require_ack_external": false,
+                "published_at": "2026-09-13T15:30:00+00:00",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T15:30:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000040",
+          "product": "erp-cloud",
+          "version": "2.3.0",
+          "title": "Emissão de NFS-e em lote",
+          "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+          "audience": "external",
+          "is_published": true,
+          "require_ack_internal": false,
+          "require_ack_external": false,
+          "published_at": "2026-09-13T15:30:00+00:00",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T15:30:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "release_notes.upsert/conflict",
+      "op": "release_notes.upsert",
+      "args": {
+        "product_slug": "erp-cloud",
+        "version": "2.4.0",
+        "title": "Corrida",
+        "description_html": "<p>x</p>"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/products/erp-cloud/release-notes/2.4.0",
+            "query": {},
+            "body": {
+              "title": "Corrida",
+              "description_html": "<p>x</p>"
+            }
+          },
+          "response": {
+            "status": 409,
+            "headers": {},
+            "body": {
+              "code": 409,
+              "data": null,
+              "message": "RELEASE_NOTE_CONFLICT",
+              "error": "RELEASE_NOTE_CONFLICT",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "conflict",
+          "code": "RELEASE_NOTE_CONFLICT",
+          "status": 409,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "release_notes.publish/ok",
+      "op": "release_notes.publish",
+      "args": {
+        "product_slug": "erp-cloud",
+        "version": "2.3.0"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/products/erp-cloud/release-notes/2.3.0/publish",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000040",
+                "product": "erp-cloud",
+                "version": "2.3.0",
+                "title": "Emissão de NFS-e em lote",
+                "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+                "audience": "external",
+                "is_published": true,
+                "require_ack_internal": false,
+                "require_ack_external": false,
+                "published_at": "2026-09-13T15:30:00+00:00",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T15:30:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000040",
+          "product": "erp-cloud",
+          "version": "2.3.0",
+          "title": "Emissão de NFS-e em lote",
+          "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+          "audience": "external",
+          "is_published": true,
+          "require_ack_internal": false,
+          "require_ack_external": false,
+          "published_at": "2026-09-13T15:30:00+00:00",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T15:30:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "kb.articles.list/filtered",
+      "op": "kb.articles.list",
+      "args": {
+        "product": "erp-cloud",
+        "status": "published",
+        "page_size": 50
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/kb/articles",
+            "query": {
+              "product": "erp-cloud",
+              "status": "published",
+              "page_size": "50"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000050",
+                  "external_id": "notion:emitir-nfse",
+                  "product": null,
+                  "title": "Como emitir NFS-e",
+                  "excerpt": "Passo a passo Abra o menu Fiscal",
+                  "status": "published",
+                  "origin": "manual",
+                  "published_at": "2026-09-13T12:00:00+00:00",
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 1,
+                "page_size": 50,
+                "total": 1,
+                "pages": 1
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "items": [
+            {
+              "id": "00000000-0000-4000-8000-000000000050",
+              "external_id": "notion:emitir-nfse",
+              "product": null,
+              "title": "Como emitir NFS-e",
+              "excerpt": "Passo a passo Abra o menu Fiscal",
+              "status": "published",
+              "origin": "manual",
+              "published_at": "2026-09-13T12:00:00+00:00",
+              "created_at": "2026-09-13T12:00:00+00:00",
+              "updated_at": "2026-09-13T12:00:00+00:00"
+            }
+          ],
+          "page": 1,
+          "page_size": 50,
+          "total": 1,
+          "pages": 1
+        }
+      }
+    },
+    {
+      "id": "kb.articles.get/ok",
+      "op": "kb.articles.get",
+      "args": {
+        "external_id": "notion:emitir-nfse"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/kb/articles/notion%3Aemitir-nfse",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000050",
+                "external_id": "notion:emitir-nfse",
+                "product": null,
+                "title": "Como emitir NFS-e",
+                "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+                "excerpt": "Passo a passo Abra o menu Fiscal",
+                "status": "published",
+                "origin": "manual",
+                "published_at": "2026-09-13T12:00:00+00:00",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000050",
+          "external_id": "notion:emitir-nfse",
+          "product": null,
+          "title": "Como emitir NFS-e",
+          "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+          "excerpt": "Passo a passo Abra o menu Fiscal",
+          "status": "published",
+          "origin": "manual",
+          "published_at": "2026-09-13T12:00:00+00:00",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "kb.articles.upsert/markdown_published_global",
+      "op": "kb.articles.upsert",
+      "args": {
+        "external_id": "notion:emitir-nfse",
+        "title": "Como emitir NFS-e",
+        "body_markdown": "# Passo a passo\n\n1. Abra o menu **Fiscal**",
+        "product": null,
+        "status": "published"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/kb/articles/notion%3Aemitir-nfse",
+            "query": {},
+            "body": {
+              "title": "Como emitir NFS-e",
+              "body_markdown": "# Passo a passo\n\n1. Abra o menu **Fiscal**",
+              "product": null,
+              "status": "published"
+            }
+          },
+          "response": {
+            "status": 201,
+            "headers": {},
+            "body": {
+              "code": 201,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000050",
+                "external_id": "notion:emitir-nfse",
+                "product": null,
+                "title": "Como emitir NFS-e",
+                "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+                "excerpt": "Passo a passo Abra o menu Fiscal",
+                "status": "published",
+                "origin": "manual",
+                "published_at": "2026-09-13T12:00:00+00:00",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000050",
+          "external_id": "notion:emitir-nfse",
+          "product": null,
+          "title": "Como emitir NFS-e",
+          "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+          "excerpt": "Passo a passo Abra o menu Fiscal",
+          "status": "published",
+          "origin": "manual",
+          "published_at": "2026-09-13T12:00:00+00:00",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "kb.articles.upsert/empty_conflict",
+      "op": "kb.articles.upsert",
+      "args": {
+        "external_id": "notion:emitir-nfse",
+        "body_html": "<p></p>"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/kb/articles/notion%3Aemitir-nfse",
+            "query": {},
+            "body": {
+              "body_html": "<p></p>"
+            }
+          },
+          "response": {
+            "status": 409,
+            "headers": {},
+            "body": {
+              "code": 409,
+              "data": null,
+              "message": "KB_ARTICLE_EMPTY",
+              "error": "KB_ARTICLE_EMPTY",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "conflict",
+          "code": "KB_ARTICLE_EMPTY",
+          "status": 409,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "kb.articles.batch_upsert/partial_failure",
+      "op": "kb.articles.batch_upsert",
+      "args": {
+        "articles": [
+          {
+            "external_id": "git:guia:instalacao",
+            "title": "Instalação",
+            "body_markdown": "Baixe e rode.",
+            "status": "published"
+          },
+          {
+            "external_id": "git:sem-titulo",
+            "body_markdown": "sem título"
+          }
+        ]
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/kb/articles/batch",
+            "query": {},
+            "body": {
+              "articles": [
+                {
+                  "external_id": "git:guia:instalacao",
+                  "title": "Instalação",
+                  "body_markdown": "Baixe e rode.",
+                  "status": "published"
+                },
+                {
+                  "external_id": "git:sem-titulo",
+                  "body_markdown": "sem título"
+                }
+              ]
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "results": [
+                  {
+                    "external_id": "git:guia:instalacao",
+                    "ok": true,
+                    "action": "created",
+                    "error": null,
+                    "article": {
+                      "id": "00000000-0000-4000-8000-000000000050",
+                      "external_id": "git:guia:instalacao",
+                      "product": null,
+                      "title": "Instalação",
+                      "excerpt": "Baixe e rode.",
+                      "status": "published",
+                      "origin": "manual",
+                      "published_at": "2026-09-13T12:00:00+00:00",
+                      "created_at": "2026-09-13T12:00:00+00:00",
+                      "updated_at": "2026-09-13T12:00:00+00:00"
+                    }
+                  },
+                  {
+                    "external_id": "git:sem-titulo",
+                    "ok": false,
+                    "action": null,
+                    "error": "KB_ARTICLE_TITLE_REQUIRED",
+                    "article": null
+                  }
+                ],
+                "created": 1,
+                "updated": 0,
+                "unchanged": 0,
+                "failed": 1
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "results": [
+            {
+              "external_id": "git:guia:instalacao",
+              "ok": true,
+              "action": "created",
+              "error": null,
+              "article": {
+                "id": "00000000-0000-4000-8000-000000000050",
+                "external_id": "git:guia:instalacao",
+                "product": null,
+                "title": "Instalação",
+                "excerpt": "Baixe e rode.",
+                "status": "published",
+                "origin": "manual",
+                "published_at": "2026-09-13T12:00:00+00:00",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              }
+            },
+            {
+              "external_id": "git:sem-titulo",
+              "ok": false,
+              "action": null,
+              "error": "KB_ARTICLE_TITLE_REQUIRED",
+              "article": null
+            }
+          ],
+          "created": 1,
+          "updated": 0,
+          "unchanged": 0,
+          "failed": 1
+        }
+      }
+    },
+    {
+      "id": "kb.articles.publish/ok",
+      "op": "kb.articles.publish",
+      "args": {
+        "external_id": "notion:emitir-nfse"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/kb/articles/notion%3Aemitir-nfse/publish",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000050",
+                "external_id": "notion:emitir-nfse",
+                "product": null,
+                "title": "Como emitir NFS-e",
+                "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+                "excerpt": "Passo a passo Abra o menu Fiscal",
+                "status": "published",
+                "origin": "manual",
+                "published_at": "2026-09-13T12:00:00+00:00",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000050",
+          "external_id": "notion:emitir-nfse",
+          "product": null,
+          "title": "Como emitir NFS-e",
+          "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+          "excerpt": "Passo a passo Abra o menu Fiscal",
+          "status": "published",
+          "origin": "manual",
+          "published_at": "2026-09-13T12:00:00+00:00",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "kb.articles.unpublish/ok",
+      "op": "kb.articles.unpublish",
+      "args": {
+        "external_id": "notion:emitir-nfse"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/kb/articles/notion%3Aemitir-nfse/unpublish",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000050",
+                "external_id": "notion:emitir-nfse",
+                "product": null,
+                "title": "Como emitir NFS-e",
+                "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+                "excerpt": "Passo a passo Abra o menu Fiscal",
+                "status": "draft",
+                "origin": "manual",
+                "published_at": null,
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000050",
+          "external_id": "notion:emitir-nfse",
+          "product": null,
+          "title": "Como emitir NFS-e",
+          "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+          "excerpt": "Passo a passo Abra o menu Fiscal",
+          "status": "draft",
+          "origin": "manual",
+          "published_at": null,
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "kb.articles.delete/ok",
+      "op": "kb.articles.delete",
+      "args": {
+        "external_id": "notion:emitir-nfse"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "DELETE",
+            "path": "/api/v1/integration/kb/articles/notion%3Aemitir-nfse",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "deleted": true
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "deleted": true
+        }
+      }
+    },
+    {
+      "id": "kb.search/ok",
+      "op": "kb.search",
+      "args": {
+        "q": "emitir nota fiscal",
+        "product": "erp-cloud",
+        "limit": 3
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/kb/search",
+            "query": {
+              "q": "emitir nota fiscal",
+              "product": "erp-cloud",
+              "limit": "3"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000050",
+                  "external_id": "notion:emitir-nfse",
+                  "title": "Como emitir NFS-e",
+                  "excerpt": "Passo a passo Abra o menu Fiscal"
+                }
+              ],
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "id": "00000000-0000-4000-8000-000000000050",
+            "external_id": "notion:emitir-nfse",
+            "title": "Como emitir NFS-e",
+            "excerpt": "Passo a passo Abra o menu Fiscal"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_agents.list/ok",
+      "op": "ai_agents.list",
+      "args": {},
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/ai-agents",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000060",
+                  "name": "Bia",
+                  "product": {
+                    "id": "00000000-0000-4000-8000-000000000020",
+                    "slug": "erp-cloud",
+                    "name": "ERP Cloud",
+                    "is_active": true
+                  },
+                  "active": true,
+                  "persona": "Cordial e objetiva",
+                  "scope": "Dúvidas de uso do ERP Cloud",
+                  "avatar_url": null,
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "id": "00000000-0000-4000-8000-000000000060",
+            "name": "Bia",
+            "product": {
+              "id": "00000000-0000-4000-8000-000000000020",
+              "slug": "erp-cloud",
+              "name": "ERP Cloud",
+              "is_active": true
+            },
+            "active": true,
+            "persona": "Cordial e objetiva",
+            "scope": "Dúvidas de uso do ERP Cloud",
+            "avatar_url": null,
+            "created_at": "2026-09-13T12:00:00+00:00",
+            "updated_at": "2026-09-13T12:00:00+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_agents.get/ok",
+      "op": "ai_agents.get",
+      "args": {
+        "agent_id": "00000000-0000-4000-8000-000000000060"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/ai-agents/00000000-0000-4000-8000-000000000060",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000060",
+                "name": "Bia",
+                "product": {
+                  "id": "00000000-0000-4000-8000-000000000020",
+                  "slug": "erp-cloud",
+                  "name": "ERP Cloud",
+                  "is_active": true
+                },
+                "active": true,
+                "persona": "Cordial e objetiva",
+                "scope": "Dúvidas de uso do ERP Cloud",
+                "avatar_url": null,
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000060",
+          "name": "Bia",
+          "product": {
+            "id": "00000000-0000-4000-8000-000000000020",
+            "slug": "erp-cloud",
+            "name": "ERP Cloud",
+            "is_active": true
+          },
+          "active": true,
+          "persona": "Cordial e objetiva",
+          "scope": "Dúvidas de uso do ERP Cloud",
+          "avatar_url": null,
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "ai_agents.preview/ok",
+      "op": "ai_agents.preview",
+      "args": {
+        "agent_id": "00000000-0000-4000-8000-000000000060",
+        "message": "Como emito uma NFS-e?",
+        "history": [
+          {
+            "role": "customer",
+            "content": "Oi"
+          },
+          {
+            "role": "bot",
+            "content": "Olá! Como posso ajudar?"
+          }
+        ]
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/ai-agents/00000000-0000-4000-8000-000000000060/preview",
+            "query": {},
+            "body": {
+              "message": "Como emito uma NFS-e?",
+              "history": [
+                {
+                  "role": "customer",
+                  "content": "Oi"
+                },
+                {
+                  "role": "bot",
+                  "content": "Olá! Como posso ajudar?"
+                }
+              ]
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "action": "answer",
+                "answer_html": "<p>Abra o menu <strong>Fiscal</strong> e clique em Emitir.</p>",
+                "escalated": false,
+                "refused": false,
+                "handoff_reason": null,
+                "guards": [],
+                "topic": "nfse",
+                "confidence": 0.82,
+                "citations": [
+                  1
+                ],
+                "collected": {},
+                "missing": [],
+                "sources": [
+                  {
+                    "type": "kb_article",
+                    "id": "00000000-0000-4000-8000-000000000050",
+                    "title": "Como emitir NFS-e"
+                  }
+                ]
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "action": "answer",
+          "answer_html": "<p>Abra o menu <strong>Fiscal</strong> e clique em Emitir.</p>",
+          "escalated": false,
+          "refused": false,
+          "handoff_reason": null,
+          "guards": [],
+          "topic": "nfse",
+          "confidence": 0.82,
+          "citations": [
+            1
+          ],
+          "collected": {},
+          "missing": [],
+          "sources": [
+            {
+              "type": "kb_article",
+              "id": "00000000-0000-4000-8000-000000000050",
+              "title": "Como emitir NFS-e"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ai_agents.preview/ai_disabled",
+      "op": "ai_agents.preview",
+      "args": {
+        "agent_id": "00000000-0000-4000-8000-000000000060",
+        "message": "Oi"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/ai-agents/00000000-0000-4000-8000-000000000060/preview",
+            "query": {},
+            "body": {
+              "message": "Oi"
+            }
+          },
+          "response": {
+            "status": 409,
+            "headers": {},
+            "body": {
+              "code": 409,
+              "data": null,
+              "message": "AI_DISABLED",
+              "error": "AI_DISABLED",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "conflict",
+          "code": "AI_DISABLED",
+          "status": 409,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "errors/authentication",
+      "op": "customers.get",
+      "args": {
+        "external_id": "ERP 1042"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 401,
+            "headers": {},
+            "body": {
+              "code": 401,
+              "data": null,
+              "message": "INTEGRATION_KEY_INVALID",
+              "error": "INTEGRATION_KEY_INVALID",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "authentication",
+          "code": "INTEGRATION_KEY_INVALID",
+          "status": 401,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "errors/scope_missing",
+      "op": "products.list",
+      "args": {},
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 403,
+            "headers": {
+              "X-Required-Scope": "products:read"
+            },
+            "body": {
+              "code": 403,
+              "data": null,
+              "message": "INTEGRATION_SCOPE_MISSING",
+              "error": "INTEGRATION_SCOPE_MISSING",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "permission_denied",
+          "code": "INTEGRATION_SCOPE_MISSING",
+          "status": 403,
+          "request_id": "req-conformance-01",
+          "required_scope": "products:read"
+        }
+      }
+    },
+    {
+      "id": "errors/module_not_contracted",
+      "op": "kb.search",
+      "args": {
+        "q": "nota fiscal"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/kb/search",
+            "query": {
+              "q": "nota fiscal"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 403,
+            "headers": {
+              "X-Required-Module": "atendimento"
+            },
+            "body": {
+              "code": 403,
+              "data": null,
+              "message": "MODULE_NOT_CONTRACTED",
+              "error": "MODULE_NOT_CONTRACTED",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "permission_denied",
+          "code": "MODULE_NOT_CONTRACTED",
+          "status": 403,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "errors/server_error_not_retried",
+      "op": "customers.list",
+      "args": {},
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 500,
+            "headers": {},
+            "body": {
+              "code": 500,
+              "data": null,
+              "message": "INTERNAL_ERROR",
+              "error": "INTERNAL_ERROR",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "server",
+          "code": "INTERNAL_ERROR",
+          "status": 500,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "errors/non_json_body",
+      "op": "products.get",
+      "args": {
+        "slug": "erp-cloud"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products/erp-cloud",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 404,
+            "headers": {
+              "X-Request-Id": "req-from-header"
+            },
+            "body": "Not Found"
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "not_found",
+          "code": "HTTP_404",
+          "status": 404,
+          "request_id": "req-from-header"
+        }
+      }
+    },
+    {
+      "id": "errors/invalid_success_body",
+      "op": "products.get",
+      "args": {
+        "slug": "erp-cloud"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products/erp-cloud",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": "<html>proxy</html>"
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "api",
+          "code": "INVALID_RESPONSE",
+          "status": 200,
+          "request_id": "$sent"
+        }
+      }
+    },
+    {
+      "id": "retry/rate_limited_then_ok",
+      "op": "customers.get",
+      "args": {
+        "external_id": "ERP 1042"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 429,
+            "headers": {
+              "Retry-After": "1"
+            },
+            "body": {
+              "code": 429,
+              "data": null,
+              "message": "RATE_LIMITED",
+              "error": "RATE_LIMITED",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        },
+        {
+          "retry": true,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "external_id": "ERP 1042",
+                "name": "Padaria Estrela",
+                "document": null,
+                "email": "contato@padaria.example",
+                "phone": null,
+                "website": null,
+                "notes": null,
+                "custom_fields": [
+                  {
+                    "key": "plano",
+                    "label": "Plano",
+                    "type": "text",
+                    "value": "ouro",
+                    "visibility": "interno"
+                  }
+                ],
+                "is_active": true,
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "external_id": "ERP 1042",
+          "name": "Padaria Estrela",
+          "document": null,
+          "email": "contato@padaria.example",
+          "phone": null,
+          "website": null,
+          "notes": null,
+          "custom_fields": [
+            {
+              "key": "plano",
+              "label": "Plano",
+              "type": "text",
+              "value": "ouro",
+              "visibility": "interno"
+            }
+          ],
+          "is_active": true,
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "retry/write_keeps_idempotency_key",
+      "op": "kb.articles.upsert",
+      "args": {
+        "external_id": "notion:emitir-nfse",
+        "title": "Como emitir NFS-e"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/kb/articles/notion%3Aemitir-nfse",
+            "query": {},
+            "body": {
+              "title": "Como emitir NFS-e"
+            }
+          },
+          "response": {
+            "status": 503,
+            "headers": {},
+            "body": "Service Unavailable"
+          }
+        },
+        {
+          "retry": true,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/kb/articles/notion%3Aemitir-nfse",
+            "query": {},
+            "body": {
+              "title": "Como emitir NFS-e"
+            }
+          },
+          "response": {
+            "status": 502,
+            "headers": {},
+            "body": "Bad Gateway"
+          }
+        },
+        {
+          "retry": true,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/kb/articles/notion%3Aemitir-nfse",
+            "query": {},
+            "body": {
+              "title": "Como emitir NFS-e"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000050",
+                "external_id": "notion:emitir-nfse",
+                "product": null,
+                "title": "Como emitir NFS-e",
+                "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+                "excerpt": "Passo a passo Abra o menu Fiscal",
+                "status": "published",
+                "origin": "manual",
+                "published_at": "2026-09-13T12:00:00+00:00",
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000050",
+          "external_id": "notion:emitir-nfse",
+          "product": null,
+          "title": "Como emitir NFS-e",
+          "body_html": "<h1>Passo a passo</h1>\n<ol>\n<li>Abra o menu <strong>Fiscal</strong></li>\n</ol>",
+          "excerpt": "Passo a passo Abra o menu Fiscal",
+          "status": "published",
+          "origin": "manual",
+          "published_at": "2026-09-13T12:00:00+00:00",
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "retry/rate_limit_exhausted",
+      "op": "products.get",
+      "args": {
+        "slug": "erp-cloud"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products/erp-cloud",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 429,
+            "headers": {
+              "Retry-After": "7"
+            },
+            "body": {
+              "code": 429,
+              "data": null,
+              "message": "RATE_LIMITED",
+              "error": "RATE_LIMITED",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        },
+        {
+          "retry": true,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products/erp-cloud",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 429,
+            "headers": {
+              "Retry-After": "7"
+            },
+            "body": {
+              "code": 429,
+              "data": null,
+              "message": "RATE_LIMITED",
+              "error": "RATE_LIMITED",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        },
+        {
+          "retry": true,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products/erp-cloud",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 429,
+            "headers": {
+              "Retry-After": "7"
+            },
+            "body": {
+              "code": 429,
+              "data": null,
+              "message": "RATE_LIMITED",
+              "error": "RATE_LIMITED",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "rate_limit",
+          "code": "RATE_LIMITED",
+          "status": 429,
+          "request_id": "req-conformance-01",
+          "retry_after": 7
+        }
+      }
+    },
+    {
+      "id": "retry/unavailable_exhausted_uses_sent_id",
+      "op": "customers.get",
+      "args": {
+        "external_id": "ERP 1042"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 503,
+            "headers": {},
+            "body": "Service Unavailable"
+          }
+        },
+        {
+          "retry": true,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 503,
+            "headers": {},
+            "body": "Service Unavailable"
+          }
+        },
+        {
+          "retry": true,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 503,
+            "headers": {},
+            "body": "Service Unavailable"
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "server",
+          "code": "HTTP_503",
+          "status": 503,
+          "request_id": "$sent"
+        }
+      }
+    },
+    {
+      "id": "customers.interactions.list_all/one_page",
+      "op": "customers.interactions.list_all",
+      "args": {
+        "external_id": "ERP 1042"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042/interactions",
+            "query": {
+              "page": "1",
+              "page_size": "100"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000030",
+                  "content": "<p>Pedido 1042 faturado.</p>",
+                  "is_internal": true,
+                  "author_kind": "human",
+                  "author_name": "Carla Lima",
+                  "created_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 1,
+                "page_size": 100,
+                "total": 1,
+                "pages": 1
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "id": "00000000-0000-4000-8000-000000000030",
+            "content": "<p>Pedido 1042 faturado.</p>",
+            "is_internal": true,
+            "author_kind": "human",
+            "author_name": "Carla Lima",
+            "created_at": "2026-09-13T12:00:00+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "release_notes.list_all/one_page",
+      "op": "release_notes.list_all",
+      "args": {
+        "product_slug": "erp-cloud",
+        "published": true
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/products/erp-cloud/release-notes",
+            "query": {
+              "published": "true",
+              "page": "1",
+              "page_size": "100"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000040",
+                  "product": "erp-cloud",
+                  "version": "2.3.0",
+                  "title": "Emissão de NFS-e em lote",
+                  "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+                  "audience": "external",
+                  "is_published": true,
+                  "require_ack_internal": false,
+                  "require_ack_external": false,
+                  "published_at": "2026-09-13T15:30:00+00:00",
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T15:30:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 1,
+                "page_size": 100,
+                "total": 1,
+                "pages": 1
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "id": "00000000-0000-4000-8000-000000000040",
+            "product": "erp-cloud",
+            "version": "2.3.0",
+            "title": "Emissão de NFS-e em lote",
+            "description_html": "<p><strong>Novidade</strong>: emita várias notas de uma vez.</p>",
+            "audience": "external",
+            "is_published": true,
+            "require_ack_internal": false,
+            "require_ack_external": false,
+            "published_at": "2026-09-13T15:30:00+00:00",
+            "created_at": "2026-09-13T12:00:00+00:00",
+            "updated_at": "2026-09-13T15:30:00+00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kb.articles.list_all/two_pages",
+      "op": "kb.articles.list_all",
+      "args": {
+        "status": "published",
+        "page_size": 1
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/kb/articles",
+            "query": {
+              "status": "published",
+              "page": "1",
+              "page_size": "1"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000050",
+                  "external_id": "notion:emitir-nfse",
+                  "product": null,
+                  "title": "Como emitir NFS-e",
+                  "excerpt": "Passo a passo Abra o menu Fiscal",
+                  "status": "published",
+                  "origin": "manual",
+                  "published_at": "2026-09-13T12:00:00+00:00",
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 1,
+                "page_size": 1,
+                "total": 2,
+                "pages": 2
+              }
+            }
+          }
+        },
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/kb/articles",
+            "query": {
+              "status": "published",
+              "page": "2",
+              "page_size": "1"
+            },
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "id": "00000000-0000-4000-8000-000000000051",
+                  "external_id": "notion:cancelar-nfse",
+                  "product": null,
+                  "title": "Como cancelar NFS-e",
+                  "excerpt": "Passo a passo Abra o menu Fiscal",
+                  "status": "published",
+                  "origin": "manual",
+                  "published_at": "2026-09-13T12:00:00+00:00",
+                  "created_at": "2026-09-13T12:00:00+00:00",
+                  "updated_at": "2026-09-13T12:00:00+00:00"
+                }
+              ],
+              "message": "Executado com sucesso",
+              "pagination": {
+                "page": 2,
+                "page_size": 1,
+                "total": 2,
+                "pages": 2
+              }
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "id": "00000000-0000-4000-8000-000000000050",
+            "external_id": "notion:emitir-nfse",
+            "product": null,
+            "title": "Como emitir NFS-e",
+            "excerpt": "Passo a passo Abra o menu Fiscal",
+            "status": "published",
+            "origin": "manual",
+            "published_at": "2026-09-13T12:00:00+00:00",
+            "created_at": "2026-09-13T12:00:00+00:00",
+            "updated_at": "2026-09-13T12:00:00+00:00"
+          },
+          {
+            "id": "00000000-0000-4000-8000-000000000051",
+            "external_id": "notion:cancelar-nfse",
+            "product": null,
+            "title": "Como cancelar NFS-e",
+            "excerpt": "Passo a passo Abra o menu Fiscal",
+            "status": "published",
+            "origin": "manual",
+            "published_at": "2026-09-13T12:00:00+00:00",
+            "created_at": "2026-09-13T12:00:00+00:00",
+            "updated_at": "2026-09-13T12:00:00+00:00"
+          }
+        ]
+      }
+    }
+  ],
+  "signatures": [
+    {
+      "secret": "bf_whs_x",
+      "user_external_id": "USR-1",
+      "customer_external_id": "ACME-1",
+      "expected": "9a15d2527b855a048094ea7826c3b0f16ae5db3035ac3537324d45007ef15141"
+    },
+    {
+      "secret": "bf_whs_9f3kQ2mZ",
+      "user_external_id": "usuário-ç",
+      "customer_external_id": "Cliente & Cia",
+      "expected": "117ddd3bdec1eb036ea62ea5937a926f9615f241cf08b0943a45d7697532e2eb"
+    }
+  ]
+}
