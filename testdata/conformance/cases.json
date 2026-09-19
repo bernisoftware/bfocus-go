@@ -981,6 +981,889 @@
       }
     },
     {
+      "id": "people.upsert/created",
+      "op": "people.upsert",
+      "args": {
+        "customer_external_id": "ERP 1042",
+        "person_external_id": "app-77",
+        "name": "Paula Reis",
+        "email": "paula@padaria.example",
+        "role": "Financeiro",
+        "is_primary": true
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/people/app-77",
+            "query": {},
+            "body": {
+              "person": {
+                "name": "Paula Reis",
+                "email": "paula@padaria.example",
+                "role": "Financeiro",
+                "is_primary": true
+              }
+            }
+          },
+          "response": {
+            "status": 201,
+            "headers": {},
+            "body": {
+              "code": 201,
+              "data": {
+                "external_id": "app-77",
+                "name": "Paula Reis",
+                "email": "paula@padaria.example",
+                "phone": null,
+                "role": "Financeiro",
+                "access": true,
+                "is_primary": true,
+                "customer_external_id": "ERP 1042",
+                "status": "created"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "external_id": "app-77",
+          "name": "Paula Reis",
+          "email": "paula@padaria.example",
+          "phone": null,
+          "role": "Financeiro",
+          "access": true,
+          "is_primary": true,
+          "customer_external_id": "ERP 1042",
+          "status": "created"
+        }
+      }
+    },
+    {
+      "id": "people.upsert/access_and_lists",
+      "op": "people.upsert",
+      "args": {
+        "customer_external_id": "ERP 1042",
+        "person_external_id": "app-77",
+        "access": false,
+        "phone": null,
+        "extra_emails": [
+          "paula.reis@pessoal.example"
+        ]
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/people/app-77",
+            "query": {},
+            "body": {
+              "person": {
+                "access": false,
+                "phone": null,
+                "extra_emails": [
+                  "paula.reis@pessoal.example"
+                ]
+              }
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "external_id": "app-77",
+                "name": "Paula Reis",
+                "email": "paula@padaria.example",
+                "phone": null,
+                "role": "Financeiro",
+                "access": false,
+                "is_primary": true,
+                "customer_external_id": "ERP 1042",
+                "status": "updated"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "external_id": "app-77",
+          "name": "Paula Reis",
+          "email": "paula@padaria.example",
+          "phone": null,
+          "role": "Financeiro",
+          "access": false,
+          "is_primary": true,
+          "customer_external_id": "ERP 1042",
+          "status": "updated"
+        }
+      }
+    },
+    {
+      "id": "people.upsert/staff_email",
+      "op": "people.upsert",
+      "args": {
+        "customer_external_id": "ERP 1042",
+        "person_external_id": "app-90",
+        "name": "Carla",
+        "email": "carla@berni.example"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/people/app-90",
+            "query": {},
+            "body": {
+              "person": {
+                "name": "Carla",
+                "email": "carla@berni.example"
+              }
+            }
+          },
+          "response": {
+            "status": 409,
+            "headers": {},
+            "body": {
+              "code": 409,
+              "data": null,
+              "message": "PERSON_EMAIL_STAFF",
+              "error": "PERSON_EMAIL_STAFF",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "conflict",
+          "code": "PERSON_EMAIL_STAFF",
+          "status": 409,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "people.list/ok",
+      "op": "people.list",
+      "args": {
+        "customer_external_id": "ERP 1042"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/customers/ERP%201042/people",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": [
+                {
+                  "external_id": "app-77",
+                  "name": "Paula Reis",
+                  "email": "paula@padaria.example",
+                  "phone": null,
+                  "role": "Financeiro",
+                  "access": true,
+                  "is_primary": true,
+                  "customer_external_id": "ERP 1042"
+                },
+                {
+                  "external_id": null,
+                  "name": "Rui Lima",
+                  "email": null,
+                  "phone": "+5511999990000",
+                  "role": "Compras",
+                  "access": false,
+                  "is_primary": false,
+                  "customer_external_id": "ERP 1042"
+                }
+              ],
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": [
+          {
+            "external_id": "app-77",
+            "name": "Paula Reis",
+            "email": "paula@padaria.example",
+            "phone": null,
+            "role": "Financeiro",
+            "access": true,
+            "is_primary": true,
+            "customer_external_id": "ERP 1042"
+          },
+          {
+            "external_id": null,
+            "name": "Rui Lima",
+            "email": null,
+            "phone": "+5511999990000",
+            "role": "Compras",
+            "access": false,
+            "is_primary": false,
+            "customer_external_id": "ERP 1042"
+          }
+        ]
+      }
+    },
+    {
+      "id": "people.delete/ok",
+      "op": "people.delete",
+      "args": {
+        "customer_external_id": "ERP 1042",
+        "person_external_id": "app-77"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "DELETE",
+            "path": "/api/v1/integration/customers/ERP%201042/people/app-77",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "external_id": "app-77",
+                "name": "Paula Reis",
+                "email": "paula@padaria.example",
+                "phone": null,
+                "role": "Financeiro",
+                "access": false,
+                "is_primary": true,
+                "customer_external_id": "ERP 1042"
+              },
+              "message": "Acesso retirado"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "external_id": "app-77",
+          "name": "Paula Reis",
+          "email": "paula@padaria.example",
+          "phone": null,
+          "role": "Financeiro",
+          "access": false,
+          "is_primary": true,
+          "customer_external_id": "ERP 1042"
+        }
+      }
+    },
+    {
+      "id": "people.delete/not_found",
+      "op": "people.delete",
+      "args": {
+        "customer_external_id": "ERP 1042",
+        "person_external_id": "app-404"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "DELETE",
+            "path": "/api/v1/integration/customers/ERP%201042/people/app-404",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 404,
+            "headers": {},
+            "body": {
+              "code": 404,
+              "data": null,
+              "message": "PERSON_NOT_FOUND",
+              "error": "PERSON_NOT_FOUND",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "not_found",
+          "code": "PERSON_NOT_FOUND",
+          "status": 404,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "customers.batch/partial_failure",
+      "op": "customers.batch",
+      "args": {
+        "items": [
+          {
+            "external_id": "ERP 1042",
+            "name": "Padaria Estrela",
+            "email": "contato@padaria.example"
+          },
+          {
+            "external_id": "ERP 1044",
+            "document": null
+          }
+        ]
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/customers/batch",
+            "query": {},
+            "body": {
+              "items": [
+                {
+                  "external_id": "ERP 1042",
+                  "name": "Padaria Estrela",
+                  "email": "contato@padaria.example"
+                },
+                {
+                  "external_id": "ERP 1044",
+                  "document": null
+                }
+              ]
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "results": [
+                  {
+                    "index": 0,
+                    "status": "updated",
+                    "external_id": "ERP 1042",
+                    "merged_into": null,
+                    "error": null,
+                    "code": null
+                  },
+                  {
+                    "index": 1,
+                    "status": "error",
+                    "external_id": "ERP 1044",
+                    "merged_into": null,
+                    "error": "NAME_REQUIRED",
+                    "code": 422
+                  }
+                ],
+                "summary": {
+                  "created": 0,
+                  "updated": 1,
+                  "unchanged": 0,
+                  "error": 1
+                }
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "results": [
+            {
+              "index": 0,
+              "status": "updated",
+              "external_id": "ERP 1042",
+              "merged_into": null,
+              "error": null,
+              "code": null
+            },
+            {
+              "index": 1,
+              "status": "error",
+              "external_id": "ERP 1044",
+              "merged_into": null,
+              "error": "NAME_REQUIRED",
+              "code": 422
+            }
+          ],
+          "summary": {
+            "created": 0,
+            "updated": 1,
+            "unchanged": 0,
+            "error": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "customers.batch/empty_no_request",
+      "op": "customers.batch",
+      "args": {
+        "items": []
+      },
+      "exchanges": [],
+      "expect": {
+        "result": {
+          "results": [],
+          "summary": {
+            "created": 0,
+            "updated": 0,
+            "unchanged": 0,
+            "error": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "people.batch/partial_failure",
+      "op": "people.batch",
+      "args": {
+        "items": [
+          {
+            "customer_external_id": "ERP 1042",
+            "external_id": "app-77",
+            "name": "Paula Reis",
+            "email": "paula@padaria.example",
+            "is_primary": true
+          },
+          {
+            "customer_external_id": "nao-existe",
+            "external_id": "app-78",
+            "name": "Rui Lima"
+          }
+        ]
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/people/batch",
+            "query": {},
+            "body": {
+              "items": [
+                {
+                  "customer_external_id": "ERP 1042",
+                  "person": {
+                    "external_id": "app-77",
+                    "name": "Paula Reis",
+                    "email": "paula@padaria.example",
+                    "is_primary": true
+                  }
+                },
+                {
+                  "customer_external_id": "nao-existe",
+                  "person": {
+                    "external_id": "app-78",
+                    "name": "Rui Lima"
+                  }
+                }
+              ]
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "results": [
+                  {
+                    "index": 0,
+                    "status": "created",
+                    "external_id": "app-77",
+                    "merged_into": null,
+                    "error": null,
+                    "code": null
+                  },
+                  {
+                    "index": 1,
+                    "status": "error",
+                    "external_id": "app-78",
+                    "merged_into": null,
+                    "error": "CUSTOMER_NOT_FOUND",
+                    "code": 404
+                  }
+                ],
+                "summary": {
+                  "created": 1,
+                  "updated": 0,
+                  "unchanged": 0,
+                  "error": 1
+                }
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "results": [
+            {
+              "index": 0,
+              "status": "created",
+              "external_id": "app-77",
+              "merged_into": null,
+              "error": null,
+              "code": null
+            },
+            {
+              "index": 1,
+              "status": "error",
+              "external_id": "app-78",
+              "merged_into": null,
+              "error": "CUSTOMER_NOT_FOUND",
+              "code": 404
+            }
+          ],
+          "summary": {
+            "created": 1,
+            "updated": 0,
+            "unchanged": 0,
+            "error": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "people.batch/empty_no_request",
+      "op": "people.batch",
+      "args": {
+        "items": []
+      },
+      "exchanges": [],
+      "expect": {
+        "result": {
+          "results": [],
+          "summary": {
+            "created": 0,
+            "updated": 0,
+            "unchanged": 0,
+            "error": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "customers.identifiers.add/with_label",
+      "op": "customers.identifiers.add",
+      "args": {
+        "external_id": "ERP 1042",
+        "extra_id": "crm-88",
+        "label": "CRM"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/identifiers/crm-88",
+            "query": {},
+            "body": {
+              "label": "CRM"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "external_id": "ERP 1042",
+                "name": "Padaria Estrela",
+                "document": null,
+                "email": "contato@padaria.example",
+                "phone": null,
+                "website": null,
+                "notes": null,
+                "custom_fields": [
+                  {
+                    "key": "plano",
+                    "label": "Plano",
+                    "type": "text",
+                    "value": "ouro",
+                    "visibility": "interno"
+                  }
+                ],
+                "is_active": true,
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00",
+                "identifiers": [
+                  {
+                    "external_id": "crm-88",
+                    "label": "CRM",
+                    "source": "api"
+                  }
+                ]
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "external_id": "ERP 1042",
+          "name": "Padaria Estrela",
+          "document": null,
+          "email": "contato@padaria.example",
+          "phone": null,
+          "website": null,
+          "notes": null,
+          "custom_fields": [
+            {
+              "key": "plano",
+              "label": "Plano",
+              "type": "text",
+              "value": "ouro",
+              "visibility": "interno"
+            }
+          ],
+          "is_active": true,
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00",
+          "identifiers": [
+            {
+              "external_id": "crm-88",
+              "label": "CRM",
+              "source": "api"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "customers.identifiers.add/in_use",
+      "op": "customers.identifiers.add",
+      "args": {
+        "external_id": "ERP 1042",
+        "extra_id": "crm-99"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/identifiers/crm-99",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 409,
+            "headers": {},
+            "body": {
+              "code": 409,
+              "data": {
+                "owner": {
+                  "kind": "customer",
+                  "id": "00000000-0000-4000-8000-000000000002",
+                  "name": "Mercado Sol",
+                  "via": "primary"
+                }
+              },
+              "message": "IDENTIFIER_IN_USE",
+              "error": "IDENTIFIER_IN_USE",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "conflict",
+          "code": "IDENTIFIER_IN_USE",
+          "status": 409,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "customers.identifiers.remove/ok",
+      "op": "customers.identifiers.remove",
+      "args": {
+        "external_id": "ERP 1042",
+        "extra_id": "crm-88"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "DELETE",
+            "path": "/api/v1/integration/customers/ERP%201042/identifiers/crm-88",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "external_id": "ERP 1042",
+                "name": "Padaria Estrela",
+                "document": null,
+                "email": "contato@padaria.example",
+                "phone": null,
+                "website": null,
+                "notes": null,
+                "custom_fields": [
+                  {
+                    "key": "plano",
+                    "label": "Plano",
+                    "type": "text",
+                    "value": "ouro",
+                    "visibility": "interno"
+                  }
+                ],
+                "is_active": true,
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00",
+                "identifiers": []
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "external_id": "ERP 1042",
+          "name": "Padaria Estrela",
+          "document": null,
+          "email": "contato@padaria.example",
+          "phone": null,
+          "website": null,
+          "notes": null,
+          "custom_fields": [
+            {
+              "key": "plano",
+              "label": "Plano",
+              "type": "text",
+              "value": "ouro",
+              "visibility": "interno"
+            }
+          ],
+          "is_active": true,
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00",
+          "identifiers": []
+        }
+      }
+    },
+    {
+      "id": "people.identifiers.add/no_label",
+      "op": "people.identifiers.add",
+      "args": {
+        "person_external_id": "app-77",
+        "extra_id": "crm-p5"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/people/app-77/identifiers/crm-p5",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "external_id": "app-77",
+                "identifiers": [
+                  {
+                    "external_id": "crm-p5",
+                    "label": null,
+                    "source": "api"
+                  }
+                ]
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "external_id": "app-77",
+          "identifiers": [
+            {
+              "external_id": "crm-p5",
+              "label": null,
+              "source": "api"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "people.identifiers.remove/not_found",
+      "op": "people.identifiers.remove",
+      "args": {
+        "person_external_id": "app-77",
+        "extra_id": "crm-p6"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "DELETE",
+            "path": "/api/v1/integration/people/app-77/identifiers/crm-p6",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 404,
+            "headers": {},
+            "body": {
+              "code": 404,
+              "data": null,
+              "message": "IDENTIFIER_NOT_FOUND",
+              "error": "IDENTIFIER_NOT_FOUND",
+              "validation": {},
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "not_found",
+          "code": "IDENTIFIER_NOT_FOUND",
+          "status": 404,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
       "id": "products.list/include_inactive",
       "op": "products.list",
       "args": {
@@ -3128,6 +4011,29 @@
       "user_external_id": "usuário-ç",
       "customer_external_id": "Cliente & Cia",
       "expected": "117ddd3bdec1eb036ea62ea5937a926f9615f241cf08b0943a45d7697532e2eb"
+    }
+  ],
+  "signatures_v2": [
+    {
+      "secret": "bf_whs_x",
+      "user_external_id": "USR-1",
+      "customer_external_id": "ACME-1",
+      "timestamp": 1789000000,
+      "expected": "v2.1789000000.bfbf2a0390fbb9d65f268899acce2b4d7a2606ba13bb25b453ff3a7971fbd7be"
+    },
+    {
+      "secret": "bf_whs_9f3kQ2mZ",
+      "user_external_id": "usuário-ç",
+      "customer_external_id": "Cliente & Cia",
+      "timestamp": 1790000123,
+      "expected": "v2.1790000123.c55cbc867b2e179616c7662350ef979c762c40c8112f633a07c2a2811a104722"
+    },
+    {
+      "secret": "bf_whs_x",
+      "user_external_id": "app-77",
+      "customer_external_id": "erp-1042",
+      "timestamp": 1789000000,
+      "expected": "v2.1789000000.36d26c050630cf6d69515b0382b5be34f658561c6a5a08d27368f9667d7d1667"
     }
   ]
 }

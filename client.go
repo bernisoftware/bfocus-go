@@ -23,6 +23,8 @@ const (
 type Client struct {
 	// Customers: clientes (e seus contatos, produtos vinculados e interações).
 	Customers *CustomersService
+	// People: pessoas dos clientes (acesso ao widget/portal) e seus identificadores.
+	People *PeopleService
 	// Products: catálogo de produtos.
 	Products *ProductsService
 	// ReleaseNotes: release notes por produto.
@@ -109,6 +111,7 @@ func NewClient(apiKey string, opts ...Option) (*Client, error) {
 	}
 
 	c.Customers = newCustomersService(c)
+	c.People = newPeopleService(c)
 	c.Products = &ProductsService{client: c}
 	c.ReleaseNotes = &ReleaseNotesService{client: c}
 	c.KB = newKBService(c)

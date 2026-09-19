@@ -265,6 +265,87 @@ type DeleteResult struct {
 	Deleted bool `json:"deleted"`
 }
 
+// Identifier é um identificador extra de um cadastro: o id de OUTRO sistema seu ligado ao
+// mesmo cliente/pessoa (o principal é o ExternalID do cadastro).
+type Identifier struct {
+	ExternalID string  `json:"external_id"`
+	Label      *string `json:"label"`
+	// Source: quem ligou ("api", "panel", "import"…).
+	Source string `json:"source"`
+}
+
+// CustomerWithIdentifiers é o cliente com os identificadores extras
+// (Customers.Identifiers.Add/Remove).
+type CustomerWithIdentifiers struct {
+	Customer
+	// Identifiers: identificadores extras (o principal é ExternalID).
+	Identifiers []Identifier `json:"identifiers"`
+}
+
+// Person é uma pessoa de um cliente: quem abre o widget/portal em nome dele.
+type Person struct {
+	// ExternalID: id da pessoa no seu sistema (nil = contato do cliente sem acesso, sem
+	// identificador).
+	ExternalID *string `json:"external_id"`
+	Name       string  `json:"name"`
+	Email      *string `json:"email"`
+	Phone      *string `json:"phone"`
+	Role       *string `json:"role"`
+	// Access: pode abrir o widget/portal do cliente.
+	Access    bool `json:"access"`
+	IsPrimary bool `json:"is_primary"`
+	// CustomerExternalID: external_id principal do cliente a que a pessoa pertence.
+	CustomerExternalID string `json:"customer_external_id"`
+}
+
+// PersonUpsertResult é o retorno de People.Upsert: a pessoa + o que aconteceu.
+type PersonUpsertResult struct {
+	Person
+	// Status: "created", "updated" ou "unchanged".
+	Status string `json:"status"`
+}
+
+// PersonIdentifiers são os identificadores de uma pessoa (People.Identifiers.Add/Remove).
+type PersonIdentifiers struct {
+	// ExternalID: identificador principal da pessoa.
+	ExternalID *string `json:"external_id"`
+	// Identifiers: identificadores extras.
+	Identifiers []Identifier `json:"identifiers"`
+}
+
+// BatchResult é o resultado de Customers.Batch e People.Batch: um resultado por item e os
+// contadores. A falha de um item não desfaz os outros.
+type BatchResult struct {
+	// Results: um resultado por item; Index é a posição no lote ENVIADO.
+	Results []BatchItemResult `json:"results"`
+	Summary BatchSummary      `json:"summary"`
+}
+
+// BatchItemResult é o resultado de um item do lote.
+type BatchItemResult struct {
+	// Index: posição do item no lote enviado (0 = primeiro).
+	Index int `json:"index"`
+	// Status: "created", "updated", "unchanged" ou "error".
+	Status string `json:"status"`
+	// ExternalID: identificador do item (o principal, depois do upsert).
+	ExternalID *string `json:"external_id"`
+	// MergedInto: o id enviado é um identificador extra; este é o principal do cadastro —
+	// atualize o id do seu lado.
+	MergedInto *string `json:"merged_into"`
+	// Error: código estável do erro do item (ex.: NAME_REQUIRED); nil quando deu certo.
+	Error *string `json:"error"`
+	// Code: status HTTP que o item teria sozinho (só em erro).
+	Code *int `json:"code"`
+}
+
+// BatchSummary conta os itens do lote por status.
+type BatchSummary struct {
+	Created   int `json:"created"`
+	Updated   int `json:"updated"`
+	Unchanged int `json:"unchanged"`
+	Error     int `json:"error"`
+}
+
 func jsonKeys(t reflect.Type) []string {
 	var keys []string
 	for i := 0; i < t.NumField(); i++ {

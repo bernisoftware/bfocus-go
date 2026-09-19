@@ -14,6 +14,7 @@ import (
 	"os"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -257,6 +258,241 @@ func TestBatchUpsertHTTPErrorKeepsSavedChunks(t *testing.T) {
 	if n := len(srv.recorded()); n != 2 {
 		t.Errorf("%d requisições, esperado 2 (o erro interrompe os lotes seguintes)", n)
 	}
+}
+
+// ── Customers.Batch / People.Batch (até MaxBatchSize, sem dividir) ───────────
+
+func customerBatch(n int) []CustomerBatchItem {
+	out := make([]CustomerBatchItem, n)
+	for i := range out {
+		out[i] = CustomerBatchItem{ExternalID: fmt.Sprintf("erp-%d", i), Name: String(fmt.Sprintf("Cliente %d", i))}
+	}
+	return out
+}
+
+func peopleBatch(n int) []PersonBatchItem {
+	out := make([]PersonBatchItem, n)
+	for i := range out {
+		out[i] = PersonBatchItem{CustomerExternalID: "erp-1", ExternalID: fmt.Sprintf("app-%d", i), Name: String(fmt.Sprintf("Pessoa %d", i))}
+	}
+	return out
+}
+
+func batchOK(n int) fakeResponse {
+	results := make([]map[string]any, n)
+	for i := range results {
+		results[i] = map[string]any{"index": i, "status": "created", "external_id": fmt.Sprintf("x-%d", i), "merged_into": nil, "error": nil, "code": nil}
+	}
+	return ok(map[string]any{"results": results, "summary": map[string]int{"created": n, "updated": 0, "unchanged": 0, "error": 0}})
+}
+
+func TestBatchOverMaxIsArgumentErrorWithoutRequest(t *testing.T) {
+	srv := newFakeServer(t)
+	c, _ := newTestClient(t, srv, nil)
+	ctx := context.Background()
+	_, err := c.Customers.Batch(ctx, customerBatch(MaxBatchSize+1))
+	mustArgErr(t, err)
+	if want := "Customers.Batch aceita até 500 itens por chamada (recebeu 501); divida em lotes de 500"; !strings.Contains(err.Error(), want) {
+		t.Errorf("mensagem %q sem %q", err, want)
+	}
+	_, err = c.People.Batch(ctx, peopleBatch(MaxBatchSize+1))
+	mustArgErr(t, err)
+	if !strings.Contains(err.Error(), "People.Batch aceita até 500") {
+		t.Errorf("mensagem %q", err)
+	}
+	mustNoRequests(t, srv)
+}
+
+func TestBatchExactlyMaxIsOneRequest(t *testing.T) {
+	srv := newFakeServer(t)
+	c, _ := newTestClient(t, srv, []fakeResponse{batchOK(MaxBatchSize), batchOK(MaxBatchSize)})
+	ctx := context.Background()
+	out, err := c.Customers.Batch(ctx, customerBatch(MaxBatchSize), WithIdempotencyKey("carga-1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Results) != MaxBatchSize || out.Summary.Created != MaxBatchSize {
+		t.Errorf("resultado: %d itens, summary %+v", len(out.Results), out.Summary)
+	}
+	if _, err := c.People.Batch(ctx, peopleBatch(MaxBatchSize)); err != nil {
+		t.Fatal(err)
+	}
+	reqs := srv.recorded()
+	if len(reqs) != 2 {
+		t.Fatalf("%d requisições, esperado 2 (uma por lote)", len(reqs))
+	}
+	for i, path := range []string{"/api/v1/integration/customers/batch", "/api/v1/integration/people/batch"} {
+		r := reqs[i]
+		if r.Method != "POST" || r.Path != path {
+			t.Errorf("requisição %d: %s %s", i, r.Method, r.Path)
+		}
+		var body struct {
+			Items []map[string]any `json:"items"`
+		}
+		if err := json.Unmarshal(r.Body, &body); err != nil {
+			t.Fatal(err)
+		}
+		if len(body.Items) != MaxBatchSize {
+			t.Errorf("requisição %d: %d itens no corpo, esperado %d", i, len(body.Items), MaxBatchSize)
+		}
+	}
+	if k := reqs[0].Header.Get("Idempotency-Key"); k != "carga-1" {
+		t.Errorf("Idempotency-Key do lote: %q", k)
+	}
+	if want := `{"items":[{"customer_external_id":"erp-1","person":{"external_id":"app-0","name":"Pessoa 0"}},`; !strings.HasPrefix(string(reqs[1].Body), want) {
+		t.Errorf("corpo de People.Batch precisa começar com %s", want)
+	}
+}
+
+func TestBatchEmptyMakesNoRequest(t *testing.T) {
+	srv := newFakeServer(t)
+	c, _ := newTestClient(t, srv, nil)
+	ctx := context.Background()
+	const zero = `{"results":[],"summary":{"created":0,"updated":0,"unchanged":0,"error":0}}`
+	for _, empty := range [][]CustomerBatchItem{nil, {}} {
+		out, err := c.Customers.Batch(ctx, empty)
+		if err != nil || string(mustJSON(out)) != zero {
+			t.Errorf("Customers.Batch vazio: %s, %v", mustJSON(out), err)
+		}
+	}
+	for _, empty := range [][]PersonBatchItem{nil, {}} {
+		out, err := c.People.Batch(ctx, empty)
+		if err != nil || string(mustJSON(out)) != zero {
+			t.Errorf("People.Batch vazio: %s, %v", mustJSON(out), err)
+		}
+	}
+	mustNoRequests(t, srv)
+}
+
+func TestBatchValidatesItemsBeforeSending(t *testing.T) {
+	srv := newFakeServer(t)
+	c, _ := newTestClient(t, srv, nil)
+	ctx := context.Background()
+	for name, items := range map[string][]CustomerBatchItem{
+		"sem ExternalID":        {{Name: String("x")}},
+		"ClearFields inválido":  {{ExternalID: "erp-1", ClearFields: []string{"nao_existe"}}},
+		"ExternalID não limpa":  {{ExternalID: "erp-1", ClearFields: []string{"external_id"}}},
+		"inválido depois de ok": {{ExternalID: "erp-1"}, {}},
+	} {
+		_, err := c.Customers.Batch(ctx, items)
+		if err == nil {
+			t.Errorf("Customers.Batch %s: esperava erro de argumento", name)
+			continue
+		}
+		mustArgErr(t, err)
+	}
+	for name, items := range map[string][]PersonBatchItem{
+		"sem cliente":           {{ExternalID: "app-1"}},
+		"sem ExternalID":        {{CustomerExternalID: "erp-1"}},
+		"cliente não limpa":     {{CustomerExternalID: "erp-1", ExternalID: "app-1", ClearFields: []string{"customer_external_id"}}},
+		"ClearFields inválido":  {{CustomerExternalID: "erp-1", ExternalID: "app-1", ClearFields: []string{"cargo"}}},
+		"inválido depois de ok": {{CustomerExternalID: "erp-1", ExternalID: "app-1"}, {ExternalID: "app-2"}},
+	} {
+		_, err := c.People.Batch(ctx, items)
+		if err == nil {
+			t.Errorf("People.Batch %s: esperava erro de argumento", name)
+			continue
+		}
+		mustArgErr(t, err)
+	}
+	mustNoRequests(t, srv)
+}
+
+func TestBatchItemsOmittedVersusNull(t *testing.T) {
+	srv := newFakeServer(t)
+	c, _ := newTestClient(t, srv, []fakeResponse{batchOK(1), batchOK(1)})
+	ctx := context.Background()
+	_, _ = c.Customers.Batch(ctx, []CustomerBatchItem{{ExternalID: "erp-1", Email: String("a@b.example"), ClearFields: []string{"document"}}})
+	_, _ = c.People.Batch(ctx, []PersonBatchItem{{CustomerExternalID: "erp-1", ExternalID: "app-1", Access: Bool(false), ClearFields: []string{"Phone"}}})
+	want := []string{
+		`{"items":[{"external_id":"erp-1","document":null,"email":"a@b.example"}]}`,
+		`{"items":[{"customer_external_id":"erp-1","person":{"external_id":"app-1","phone":null,"access":false}}]}`,
+	}
+	for i, r := range srv.recorded() {
+		if string(r.Body) != want[i] {
+			t.Errorf("corpo %s\n    esperado %s", r.Body, want[i])
+		}
+	}
+}
+
+// ── pessoas e identificadores ────────────────────────────────────────────────
+
+func TestPeopleUpsertWrapsBodyInPerson(t *testing.T) {
+	srv := newFakeServer(t)
+	c, _ := newTestClient(t, srv, []fakeResponse{ok(map[string]any{}), ok(map[string]any{}), ok(map[string]any{})})
+	ctx := context.Background()
+	_, _ = c.People.Upsert(ctx, "erp-1042", "app-77", nil)
+	_, _ = c.People.Upsert(ctx, "erp-1042", "app-77", &PersonParams{
+		Name: String("Paula"), Email: String("p@x.example"), Phone: String("1"), Role: String("Fin"), Access: Bool(true),
+		IsPrimary: Bool(false), ExtraEmails: []string{"p2@x.example"}, ExtraPhones: []string{},
+	})
+	_, _ = c.People.Upsert(ctx, "erp-1042", "app-77", &PersonParams{ClearFields: []string{"role", "ExtraPhones"}})
+	want := []string{
+		`{"person":{}}`,
+		`{"person":{"name":"Paula","email":"p@x.example","phone":"1","role":"Fin","access":true,"is_primary":false,"extra_emails":["p2@x.example"],"extra_phones":[]}}`,
+		`{"person":{"role":null,"extra_phones":null}}`,
+	}
+	for i, r := range srv.recorded() {
+		if r.Method != "PUT" || r.Path != "/api/v1/integration/customers/erp-1042/people/app-77" {
+			t.Errorf("%s %s", r.Method, r.Path)
+		}
+		if string(r.Body) != want[i] {
+			t.Errorf("corpo %s\n    esperado %s", r.Body, want[i])
+		}
+	}
+}
+
+func TestIdentifiersBodyOnlyWithLabelAndPaths(t *testing.T) {
+	srv := newFakeServer(t)
+	c, _ := newTestClient(t, srv, []fakeResponse{ok(map[string]any{}), ok(map[string]any{}), ok(map[string]any{}), ok(map[string]any{}), ok(map[string]any{})})
+	ctx := context.Background()
+	_, _ = c.Customers.Identifiers.Add(ctx, "ERP 1042", "crm 88", &IdentifierParams{Label: String("CRM")})
+	_, _ = c.Customers.Identifiers.Add(ctx, "erp-1042", "crm-88", nil)
+	_, _ = c.Customers.Identifiers.Add(ctx, "erp-1042", "crm-88", &IdentifierParams{})
+	_, _ = c.People.Identifiers.Add(ctx, "app 77", "crm/p5", &IdentifierParams{Label: String("CRM")})
+	_, _ = c.People.Identifiers.Remove(ctx, "app-77", "crm-p5")
+	want := []struct{ method, path, body string }{
+		{"PUT", "/api/v1/integration/customers/ERP%201042/identifiers/crm%2088", `{"label":"CRM"}`},
+		{"PUT", "/api/v1/integration/customers/erp-1042/identifiers/crm-88", ""},
+		{"PUT", "/api/v1/integration/customers/erp-1042/identifiers/crm-88", ""},
+		{"PUT", "/api/v1/integration/people/app%2077/identifiers/crm%2Fp5", `{"label":"CRM"}`},
+		{"DELETE", "/api/v1/integration/people/app-77/identifiers/crm-p5", ""},
+	}
+	for i, r := range srv.recorded() {
+		if r.Method != want[i].method || r.Path != want[i].path || string(r.Body) != want[i].body {
+			t.Errorf("chamada %d: %s %s %q, esperado %s %s %q", i, r.Method, r.Path, r.Body, want[i].method, want[i].path, want[i].body)
+		}
+		if want[i].body == "" && r.has("Content-Type") {
+			t.Errorf("chamada %d: Content-Type sem corpo", i)
+		}
+	}
+}
+
+func TestPeopleInvalidPathParamsFailBeforeAnyRequest(t *testing.T) {
+	srv := newFakeServer(t)
+	c, _ := newTestClient(t, srv, nil)
+	ctx := context.Background()
+	for name, call := range map[string]func() error{
+		"upsert sem cliente":        func() error { _, err := c.People.Upsert(ctx, "", "app-1", nil); return err },
+		"upsert pessoa ..":          func() error { _, err := c.People.Upsert(ctx, "erp-1", "..", nil); return err },
+		"list cliente .":            func() error { _, err := c.People.List(ctx, "."); return err },
+		"delete pessoa vazia":       func() error { _, err := c.People.Delete(ctx, "erp-1", ""); return err },
+		"identificador vazio":       func() error { _, err := c.Customers.Identifiers.Add(ctx, "erp-1", "", nil); return err },
+		"cliente .. no identif.":    func() error { _, err := c.Customers.Identifiers.Remove(ctx, "..", "crm-1"); return err },
+		"pessoa vazia no identif.":  func() error { _, err := c.People.Identifiers.Add(ctx, "", "crm-1", nil); return err },
+		"identificador . da pessoa": func() error { _, err := c.People.Identifiers.Remove(ctx, "app-1", "."); return err },
+		"ClearFields desconhecido": func() error {
+			_, err := c.People.Upsert(ctx, "erp-1", "app-1", &PersonParams{ClearFields: []string{"cargo"}})
+			return err
+		},
+	} {
+		if err := call(); err == nil {
+			t.Errorf("%s: esperava erro de argumento", name)
+		} else {
+			mustArgErr(t, err)
+		}
+	}
+	mustNoRequests(t, srv)
 }
 
 // ── ListAll ──────────────────────────────────────────────────────────────────
@@ -1173,6 +1409,57 @@ func TestSignWidgetIdentity(t *testing.T) {
 			t.Errorf("%v: assinatura com argumento vazio", args)
 		}
 		mustArgErr(t, err)
+	}
+}
+
+func TestSignWidgetIdentityV2(t *testing.T) {
+	at := time.Unix(1789000000, 999_000_000) // fração de segundo: ts arredonda para baixo
+	got, err := SignWidgetIdentityV2At("bf_whs_x", "USR-1", "ACME-1", at)
+	if err != nil || got != "v2.1789000000.bfbf2a0390fbb9d65f268899acce2b4d7a2606ba13bb25b453ff3a7971fbd7be" {
+		t.Errorf("assinatura %q, %v", got, err)
+	}
+	// o id do CLIENTE pode ter ':'
+	if _, err := SignWidgetIdentityV2At("bf_whs_x", "app-77", "erp:1042", at); err != nil {
+		t.Errorf("cliente com ':' devia ser aceito: %v", err)
+	}
+
+	before := time.Now().Unix()
+	sig, err := SignWidgetIdentityV2("bf_whs_x", "USR-1", "ACME-1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := regexp.MustCompile(`^v2\.(\d+)\.([0-9a-f]{64})$`).FindStringSubmatch(sig)
+	if m == nil {
+		t.Fatalf("formato %q", sig)
+	}
+	ts, _ := strconv.ParseInt(m[1], 10, 64)
+	if now := time.Now().Unix(); ts < before-5 || ts > now+5 {
+		t.Errorf("ts %d fora de ±5 s de agora (%d)", ts, now)
+	}
+	if again, _ := SignWidgetIdentityV2At("bf_whs_x", "USR-1", "ACME-1", time.Unix(ts, 0)); again != sig {
+		t.Errorf("sem instante ≠ com o mesmo instante: %s × %s", sig, again)
+	}
+
+	for name, call := range map[string]func() (string, error){
+		"segredo vazio":  func() (string, error) { return SignWidgetIdentityV2("", "u", "c") },
+		"usuário vazio":  func() (string, error) { return SignWidgetIdentityV2At("s", "", "c", at) },
+		"cliente vazio":  func() (string, error) { return SignWidgetIdentityV2("s", "u", "") },
+		"':' no usuário": func() (string, error) { return SignWidgetIdentityV2("s", "app:77", "c") },
+		"':' no usuário (At)": func() (string, error) {
+			return SignWidgetIdentityV2At("s", "erp:1:u", "c", at)
+		},
+		"instante negativo": func() (string, error) { return SignWidgetIdentityV2At("s", "u", "c", time.Unix(-1, 0)) },
+		"time.Time zero":    func() (string, error) { return SignWidgetIdentityV2At("s", "u", "c", time.Time{}) },
+	} {
+		sig, err := call()
+		if sig != "" {
+			t.Errorf("%s: assinatura %q", name, sig)
+		}
+		mustArgErr(t, err)
+	}
+	// a v1 não mudou
+	if v1, err := SignWidgetIdentity("bf_whs_x", "USR-1", "ACME-1"); err != nil || v1 != "9a15d2527b855a048094ea7826c3b0f16ae5db3035ac3537324d45007ef15141" {
+		t.Errorf("v1: %q, %v", v1, err)
 	}
 }
 

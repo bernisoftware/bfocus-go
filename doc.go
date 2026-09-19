@@ -1,7 +1,8 @@
 // Package bfocus é a SDK oficial em Go da API pública do bFocus
-// (https://api.bfocus.com.br): clientes, contatos, produtos, release notes, base de
-// conhecimento e agentes de IA — com novas tentativas idempotentes, erros tipados e a
-// assinatura da identidade do widget. Só usa a biblioteca padrão.
+// (https://api.bfocus.com.br): clientes, pessoas, contatos, lotes, identificadores extras,
+// produtos, release notes, base de conhecimento e agentes de IA — com novas tentativas
+// idempotentes, erros tipados e a assinatura da identidade do widget (v1 e v2). Só usa a
+// biblioteca padrão.
 //
 //	client, err := bfocus.NewClient(os.Getenv("BFOCUS_API_KEY"))
 //	if err != nil {
@@ -37,7 +38,8 @@
 //	if errors.Is(err, bfocus.ErrRateLimit) { /* … */ }
 //
 // Argumento inválido (chave vazia, parâmetro de caminho vazio, "." ou "..", "/" no
-// external_id de artigo, campo desconhecido em ClearFields) devolve, antes de qualquer
+// external_id de artigo, campo desconhecido em ClearFields, mais de MaxBatchSize itens num
+// lote) devolve, antes de qualquer
 // requisição, um erro que satisfaz errors.Is(err, ErrInvalidArgument) — e que não é
 // *Error. Cancelar o ctx devolve ctx.Err(), sem nova tentativa.
 package bfocus

@@ -55,6 +55,13 @@ type conformanceFile struct {
 		CustomerExternalID string `json:"customer_external_id"`
 		Expected           string `json:"expected"`
 	} `json:"signatures"`
+	SignaturesV2 []struct {
+		Secret             string `json:"secret"`
+		UserExternalID     string `json:"user_external_id"`
+		CustomerExternalID string `json:"customer_external_id"`
+		Timestamp          int64  `json:"timestamp"`
+		Expected           string `json:"expected"`
+	} `json:"signatures_v2"`
 }
 
 type conformanceCase struct {
@@ -133,6 +140,21 @@ func (a caseArgs) only(names ...string) {
 	for _, name := range names {
 		a.str(name)
 	}
+}
+
+// items lê o único arg `items` (lista de objetos) dos lotes.
+func (a caseArgs) items() []map[string]json.RawMessage {
+	a.t.Helper()
+	for key := range a.raw {
+		if key != "items" {
+			a.t.Fatalf("arg %q sem parâmetro correspondente na SDK", key)
+		}
+	}
+	var items []map[string]json.RawMessage
+	if err := json.Unmarshal(a.raw["items"], &items); err != nil {
+		a.t.Fatalf("args.items: %v", err)
+	}
+	return items
 }
 
 // params converte os args (menos os posicionais) no struct de parâmetros T. Chave com
@@ -245,6 +267,50 @@ var conformanceOps = map[string]opFunc{
 	"customers.interactions.create": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
 		return ret(c.Customers.Interactions.Create(ctx, a.str("external_id"), a.str("content"),
 			params[InteractionCreateParams](a, "external_id", "content")))
+	},
+	"customers.batch": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		raw := a.items()
+		items := make([]CustomerBatchItem, len(raw))
+		for i, item := range raw {
+			items[i] = *decodeParams[CustomerBatchItem](a.t, item)
+		}
+		return ret(c.Customers.Batch(ctx, items))
+	},
+	"customers.identifiers.add": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		return ret(c.Customers.Identifiers.Add(ctx, a.str("external_id"), a.str("extra_id"),
+			params[IdentifierParams](a, "external_id", "extra_id")))
+	},
+	"customers.identifiers.remove": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		a.only("external_id", "extra_id")
+		return ret(c.Customers.Identifiers.Remove(ctx, a.str("external_id"), a.str("extra_id")))
+	},
+	"people.upsert": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		return ret(c.People.Upsert(ctx, a.str("customer_external_id"), a.str("person_external_id"),
+			params[PersonParams](a, "customer_external_id", "person_external_id")))
+	},
+	"people.list": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		a.only("customer_external_id")
+		return ret(c.People.List(ctx, a.str("customer_external_id")))
+	},
+	"people.delete": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		a.only("customer_external_id", "person_external_id")
+		return ret(c.People.Delete(ctx, a.str("customer_external_id"), a.str("person_external_id")))
+	},
+	"people.batch": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		raw := a.items()
+		items := make([]PersonBatchItem, len(raw))
+		for i, item := range raw {
+			items[i] = *decodeParams[PersonBatchItem](a.t, item)
+		}
+		return ret(c.People.Batch(ctx, items))
+	},
+	"people.identifiers.add": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		return ret(c.People.Identifiers.Add(ctx, a.str("person_external_id"), a.str("extra_id"),
+			params[IdentifierParams](a, "person_external_id", "extra_id")))
+	},
+	"people.identifiers.remove": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		a.only("person_external_id", "extra_id")
+		return ret(c.People.Identifiers.Remove(ctx, a.str("person_external_id"), a.str("extra_id")))
 	},
 	"products.list": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
 		return ret(c.Products.List(ctx, params[ProductListParams](a)))
@@ -803,6 +869,22 @@ func TestSignatureVectors(t *testing.T) {
 		}
 		if got != v.Expected {
 			t.Errorf("SignWidgetIdentity(%q, %q, %q) = %s, esperado %s", v.Secret, v.UserExternalID, v.CustomerExternalID, got, v.Expected)
+		}
+	}
+}
+
+func TestSignatureV2Vectors(t *testing.T) {
+	file := loadConformance(t)
+	if len(file.SignaturesV2) == 0 {
+		t.Fatal("cases.json sem vetores de assinatura v2")
+	}
+	for _, v := range file.SignaturesV2 {
+		got, err := SignWidgetIdentityV2At(v.Secret, v.UserExternalID, v.CustomerExternalID, time.Unix(v.Timestamp, 0))
+		if err != nil {
+			t.Fatalf("%s: %v", v.UserExternalID, err)
+		}
+		if got != v.Expected {
+			t.Errorf("SignWidgetIdentityV2At(%q, %q, %q, %d) = %s, esperado %s", v.Secret, v.UserExternalID, v.CustomerExternalID, v.Timestamp, got, v.Expected)
 		}
 	}
 }

@@ -2,6 +2,7 @@ package bfocus
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -14,6 +15,8 @@ type CustomersService struct {
 	Products *CustomerProductsService
 	// Interactions: histórico de interações dos clientes.
 	Interactions *CustomerInteractionsService
+	// Identifiers: identificadores extras dos clientes.
+	Identifiers *CustomerIdentifiersService
 }
 
 func newCustomersService(c *Client) *CustomersService {
@@ -22,6 +25,7 @@ func newCustomersService(c *Client) *CustomersService {
 		Contacts:     &CustomerContactsService{client: c},
 		Products:     &CustomerProductsService{client: c},
 		Interactions: &CustomerInteractionsService{client: c},
+		Identifiers:  &CustomerIdentifiersService{client: c},
 	}
 }
 
@@ -89,6 +93,35 @@ func (s *CustomersService) Delete(ctx context.Context, externalID string, opts .
 		return nil, err
 	}
 	return callObject[DeleteResult](ctx, s.client, writeRequest(http.MethodDelete, path, nil, opts))
+}
+
+// Batch cria ou atualiza até MaxBatchSize clientes numa chamada — POST /customers/batch.
+// Cada item é o corpo do Upsert (só o que veio; ClearFields envia null) mais o ExternalID.
+//
+// Mais de MaxBatchSize itens: erro de argumento, sem requisição (a SDK NÃO divide — divida
+// em fatias de MaxBatchSize; o Index de cada resultado é a posição no lote enviado). Lista
+// vazia devolve o resultado zerado sem requisição. Todos os itens são validados antes do
+// envio. A falha de um item não desfaz os outros: confira Summary.Error e, em cada
+// BatchItemResult, Error/Code; MergedInto preenchido = atualize o id do seu lado.
+func (s *CustomersService) Batch(ctx context.Context, items []CustomerBatchItem, opts ...RequestOption) (*BatchResult, error) {
+	if err := checkBatchSize("Customers.Batch", len(items)); err != nil {
+		return nil, err
+	}
+	if len(items) == 0 {
+		return emptyBatchResult(), nil
+	}
+	encoded := make([][]byte, len(items))
+	for i := range items {
+		if items[i].ExternalID == "" {
+			return nil, argErr(fmt.Sprintf("o item #%d do lote (Customers.Batch) não tem ExternalID", i))
+		}
+		body, err := encodePatch(&items[i])
+		if err != nil {
+			return nil, err
+		}
+		encoded[i] = body
+	}
+	return postBatch(ctx, s.client, "/customers/batch", encoded, opts)
 }
 
 // CustomerContactsService: contatos de um cliente — client.Customers.Contacts.
@@ -234,4 +267,47 @@ func (s *CustomerInteractionsService) Create(ctx context.Context, externalID, co
 		return nil, err
 	}
 	return callObject[Interaction](ctx, s.client, writeRequest(http.MethodPost, path+"/interactions", body, opts))
+}
+
+// CustomerIdentifiersService: identificadores extras de um cliente —
+// client.Customers.Identifiers. Liga o id de OUTRO sistema seu ao mesmo cadastro.
+type CustomerIdentifiersService struct{ client *Client }
+
+func customerIdentifierPath(externalID, extraID string) (string, error) {
+	base, err := customerPath(externalID)
+	if err != nil {
+		return "", err
+	}
+	seg, err := segment("extraID", extraID)
+	if err != nil {
+		return "", err
+	}
+	return base + "/identifiers/" + seg, nil
+}
+
+// Add liga o identificador extraID ao cliente (idempotente) — PUT
+// /customers/{external_id}/identifiers/{extra_id}. params pode ser nil (sem corpo); com
+// Label, o corpo é {"label": …}. extraID já é de outro cadastro: ErrConflict com Code
+// IDENTIFIER_IN_USE.
+func (s *CustomerIdentifiersService) Add(ctx context.Context, externalID, extraID string, params *IdentifierParams, opts ...RequestOption) (*CustomerWithIdentifiers, error) {
+	path, err := customerIdentifierPath(externalID, extraID)
+	if err != nil {
+		return nil, err
+	}
+	body, err := identifierBody(params)
+	if err != nil {
+		return nil, err
+	}
+	return callObject[CustomerWithIdentifiers](ctx, s.client, writeRequest(http.MethodPut, path, body, opts))
+}
+
+// Remove desliga o identificador extraID do cliente — DELETE
+// /customers/{external_id}/identifiers/{extra_id}. Não ligado: ErrNotFound com Code
+// IDENTIFIER_NOT_FOUND.
+func (s *CustomerIdentifiersService) Remove(ctx context.Context, externalID, extraID string, opts ...RequestOption) (*CustomerWithIdentifiers, error) {
+	path, err := customerIdentifierPath(externalID, extraID)
+	if err != nil {
+		return nil, err
+	}
+	return callObject[CustomerWithIdentifiers](ctx, s.client, writeRequest(http.MethodDelete, path, nil, opts))
 }

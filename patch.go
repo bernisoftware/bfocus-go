@@ -12,7 +12,9 @@ import (
 // Corpo dos upserts ("só o que veio muda"). Nos structs de parâmetros:
 //   - campo nil (ponteiro, slice, map) = OMITIDO: não vai no corpo e fica como está;
 //   - campo em ClearFields = null: LIMPA o campo (se tiver valor, vale o valor);
-//   - campo não-ponteiro (ex.: KBBatchArticle.ExternalID) vai sempre.
+//   - campo não-ponteiro (ex.: KBBatchArticle.ExternalID) vai sempre;
+//   - campo com a tag `bfocus:"skip"` (ex.: PersonBatchItem.CustomerExternalID) não entra
+//     no corpo: o método o põe em outro lugar.
 //
 // ClearFields aceita o nome JSON ("phone") ou o nome Go ("Phone"). Nome desconhecido, ou
 // campo que a API não aceita como null (tag `bfocus:"noclear"`), é erro de argumento antes
@@ -49,7 +51,7 @@ func schemaFor(t reflect.Type) *patchSchema {
 			continue
 		}
 		wire, _, _ := strings.Cut(f.Tag.Get("json"), ",")
-		if wire == "" || wire == "-" {
+		if wire == "" || wire == "-" || f.Tag.Get("bfocus") == "skip" {
 			continue
 		}
 		k := f.Type.Kind()

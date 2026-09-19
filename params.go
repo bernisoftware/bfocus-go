@@ -113,6 +113,32 @@ type ContactUpsertParams struct {
 	ClearFields []string `json:"-"`
 }
 
+// CustomerBatchItem é um item de Customers.Batch: os campos de CustomerUpsertParams mais o
+// ExternalID do cliente (obrigatório no item). Cada item vai no corpo exatamente como o
+// corpo do Upsert (só o que veio; ClearFields envia null) + "external_id".
+type CustomerBatchItem struct {
+	// ExternalID: id do cliente no seu sistema (obrigatório; qualquer texto — ex.:
+	// "erp-1042").
+	ExternalID string `json:"external_id" bfocus:"noclear"`
+	// Name: nome (até 500; obrigatório ao criar).
+	Name *string `json:"name,omitempty"`
+	// Document: CPF/CNPJ ou outro documento (até 50).
+	Document *string `json:"document,omitempty"`
+	// Email: e-mail (até 255).
+	Email *string `json:"email,omitempty"`
+	// Phone: telefone (até 50).
+	Phone *string `json:"phone,omitempty"`
+	// Website: site (até 500).
+	Website *string `json:"website,omitempty"`
+	// Notes: observações.
+	Notes *string `json:"notes,omitempty"`
+	// CustomFields: campos personalizados. Quando enviada (não nil), a lista SUBSTITUI a
+	// atual.
+	CustomFields []CustomFieldInput `json:"custom_fields,omitempty"`
+	// ClearFields: campos a LIMPAR (enviados como null).
+	ClearFields []string `json:"-"`
+}
+
 // InteractionListParams pagina Customers.Interactions.List e ListAll.
 type InteractionListParams struct {
 	// Page: página (a partir de 1). Em ListAll, a página inicial (padrão 1).
@@ -127,6 +153,69 @@ type InteractionCreateParams struct {
 	IsInternal *bool `json:"is_internal,omitempty"`
 	// AuthorEmail: e-mail de um usuário do bFocus para constar como autor.
 	AuthorEmail *string `json:"author_email,omitempty"`
+}
+
+// ── pessoas ──────────────────────────────────────────────────────────────────
+
+// PersonParams é o corpo de People.Upsert (vai dentro de {"person": …}). Parcial: campo nil
+// é omitido (fica como está); para enviar null, ponha o nome em ClearFields (a API trata
+// null como "não altera").
+type PersonParams struct {
+	// Name: nome (obrigatório ao criar).
+	Name *string `json:"name,omitempty"`
+	// Email: e-mail. Acha a pessoa que já chegou por e-mail/outro sistema e a adota, sem
+	// duplicar.
+	Email *string `json:"email,omitempty"`
+	// Phone: telefone (também identifica a pessoa já cadastrada).
+	Phone *string `json:"phone,omitempty"`
+	// Role: cargo/função no cliente (ex.: "Financeiro").
+	Role *string `json:"role,omitempty"`
+	// Access: acesso ao widget/portal (padrão ao criar: true). false retira o acesso;
+	// true devolve.
+	Access *bool `json:"access,omitempty"`
+	// IsPrimary: contato principal do cliente.
+	IsPrimary *bool `json:"is_primary,omitempty"`
+	// ExtraEmails: e-mails adicionais (somam aos que já existem).
+	ExtraEmails []string `json:"extra_emails,omitempty"`
+	// ExtraPhones: telefones adicionais (somam aos que já existem).
+	ExtraPhones []string `json:"extra_phones,omitempty"`
+	// ClearFields: campos a enviar como null.
+	ClearFields []string `json:"-"`
+}
+
+// PersonBatchItem é um item de People.Batch: o cliente, o id da pessoa e os campos de
+// PersonParams. No fio vira {"customer_external_id": …, "person": {"external_id": …, …}}.
+type PersonBatchItem struct {
+	// CustomerExternalID: external_id do cliente a que a pessoa pertence (obrigatório).
+	CustomerExternalID string `json:"customer_external_id" bfocus:"skip"`
+	// ExternalID: id da pessoa no seu sistema (obrigatório) — o mesmo user.externalId
+	// assinado no widget.
+	ExternalID string `json:"external_id" bfocus:"noclear"`
+	// Name: nome (obrigatório ao criar).
+	Name *string `json:"name,omitempty"`
+	// Email: e-mail (acha a pessoa já cadastrada, sem duplicar).
+	Email *string `json:"email,omitempty"`
+	// Phone: telefone.
+	Phone *string `json:"phone,omitempty"`
+	// Role: cargo/função no cliente.
+	Role *string `json:"role,omitempty"`
+	// Access: acesso ao widget/portal (padrão ao criar: true).
+	Access *bool `json:"access,omitempty"`
+	// IsPrimary: contato principal do cliente.
+	IsPrimary *bool `json:"is_primary,omitempty"`
+	// ExtraEmails: e-mails adicionais (somam aos que já existem).
+	ExtraEmails []string `json:"extra_emails,omitempty"`
+	// ExtraPhones: telefones adicionais (somam aos que já existem).
+	ExtraPhones []string `json:"extra_phones,omitempty"`
+	// ClearFields: campos a enviar como null.
+	ClearFields []string `json:"-"`
+}
+
+// IdentifierParams são os campos opcionais de Customers.Identifiers.Add e
+// People.Identifiers.Add. nil (ou Label nil) = requisição sem corpo.
+type IdentifierParams struct {
+	// Label: rótulo livre (até 120; ex.: o nome do sistema — "CRM").
+	Label *string `json:"label,omitempty"`
 }
 
 // ── produtos ─────────────────────────────────────────────────────────────────
