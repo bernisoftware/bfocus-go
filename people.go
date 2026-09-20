@@ -11,7 +11,8 @@ import (
 // client.People. Escopos: customers:read / customers:write.
 //
 // O e-mail (ou o telefone) acha a pessoa que já chegou por e-mail ou por outro sistema, e
-// ela é ADOTADA — nunca duplicada. A mesma pessoa enviada com outro cliente é transferida.
+// ela é ADOTADA — nunca duplicada. A mesma pessoa enviada com outro cliente é LIGADA a ele
+// também (cadastro único em N clientes); Linked volta true.
 type PeopleService struct {
 	client *Client
 	// Identifiers: identificadores extras das pessoas.
@@ -74,12 +75,12 @@ func (s *PeopleService) List(ctx context.Context, customerExternalID string) ([]
 // Delete RETIRA O ACESSO da pessoa — DELETE /customers/{external_id}/people/{person_external_id}.
 // A pessoa continua no histórico (devolvida com Access false); Upsert com Access
 // Bool(true) devolve o acesso. Não achou: ErrNotFound com Code PERSON_NOT_FOUND.
-func (s *PeopleService) Delete(ctx context.Context, customerExternalID, personExternalID string, opts ...RequestOption) (*Person, error) {
+func (s *PeopleService) Delete(ctx context.Context, customerExternalID, personExternalID string, opts ...RequestOption) (*PersonRevokeResult, error) {
 	path, err := personPath(customerExternalID, personExternalID)
 	if err != nil {
 		return nil, err
 	}
-	return callObject[Person](ctx, s.client, writeRequest(http.MethodDelete, path, nil, opts))
+	return callObject[PersonRevokeResult](ctx, s.client, writeRequest(http.MethodDelete, path, nil, opts))
 }
 
 // Batch cria ou atualiza até MaxBatchSize pessoas numa chamada — POST /people/batch. Cada

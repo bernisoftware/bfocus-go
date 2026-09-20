@@ -25,8 +25,13 @@ type Customer struct {
 	Notes        *string       `json:"notes"`
 	CustomFields []CustomField `json:"custom_fields"`
 	IsActive     bool          `json:"is_active"`
-	CreatedAt    *time.Time    `json:"created_at"`
-	UpdatedAt    *time.Time    `json:"updated_at"`
+	// LogoURL: logotipo do cliente, como a equipe subiu no bFocus (nil = sem logotipo).
+	LogoURL *string `json:"logo_url"`
+	// ExtraEmails e ExtraPhones: contatos adicionais (os principais são Email e Phone).
+	ExtraEmails []string   `json:"extra_emails"`
+	ExtraPhones []string   `json:"extra_phones"`
+	CreatedAt   *time.Time `json:"created_at"`
+	UpdatedAt   *time.Time `json:"updated_at"`
 }
 
 // CustomField é um campo personalizado de um cliente ou de uma pessoa, como a API guardou.
@@ -328,6 +333,9 @@ type Person struct {
 	CustomerExternalID string `json:"customer_external_id"`
 	// CustomFields: campos personalizados da pessoa (Visibility vem definida no bFocus).
 	CustomFields []CustomField `json:"custom_fields"`
+	// Identifiers: identificadores EXTRAS desta pessoa — os outros ids pelos quais ela também
+	// é encontrada. É por aqui que você descobre que o id do SEU sistema virou apelido.
+	Identifiers []Identifier `json:"identifiers"`
 }
 
 // PersonUpsertResult é o retorno de People.Upsert: a pessoa + o que aconteceu.
@@ -335,6 +343,19 @@ type PersonUpsertResult struct {
 	Person
 	// Status: "created", "updated" ou "unchanged".
 	Status string `json:"status"`
+	// Linked: a pessoa JÁ EXISTIA em outro cliente e esta chamada a ligou também a este. O
+	// cadastro é único e ela circula pelos dois — nada foi transferido nem duplicado.
+	Linked bool `json:"linked"`
+	// MergedInto: o id enviado é um APELIDO; este é o principal do cadastro.
+	MergedInto *string `json:"merged_into"`
+}
+
+// PersonRevokeResult é o retorno de People.Delete: a pessoa + se ela apenas saiu DESTE cliente.
+type PersonRevokeResult struct {
+	Person
+	// Unlinked: ela continua com acesso, porque também é de outros clientes (o acesso é do
+	// vínculo). false = era só deste cliente e foi desligada, como sempre.
+	Unlinked bool `json:"unlinked"`
 }
 
 // PersonIdentifiers são os identificadores de uma pessoa (People.Identifiers.Add/Remove).
@@ -364,6 +385,8 @@ type BatchItemResult struct {
 	// MergedInto: o id enviado é um identificador extra; este é o principal do cadastro —
 	// atualize o id do seu lado.
 	MergedInto *string `json:"merged_into"`
+	// Linked: a pessoa já existia em outro cliente e este item a ligou também a este.
+	Linked bool `json:"linked"`
 	// Error: código estável do erro do item (ex.: NAME_REQUIRED); nil quando deu certo.
 	Error *string `json:"error"`
 	// Code: status HTTP que o item teria sozinho (só em erro).

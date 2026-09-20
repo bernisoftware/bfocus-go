@@ -206,8 +206,11 @@ client.People.Upsert(ctx, "erp-1042", "app-77", &bfocus.PersonParams{Access: bfo
 ```
 
 - **Nunca duplica.** O e-mail (ou o telefone) acha a pessoa que já chegou por e-mail ou por outro
-  sistema, e ela é **adotada** pelo seu id. A mesma pessoa enviada com outro cliente é
-  **transferida** para ele.
+  sistema, e ela é **adotada** pelo seu id. A mesma pessoa enviada com **outro cliente** NÃO muda
+  de casa: ela é **ligada** também a esse cliente e `Linked` volta `true` — o cadastro é único e a
+  mesma pessoa circula por vários clientes e vários produtos.
+- **O acesso é do VÍNCULO.** `Delete` (e `Access: Bool(false)`) tira o acesso dela NESTE cliente e
+  não nos outros: `PersonRevokeResult.Unlinked = true` quer dizer que ela segue ativa em algum outro.
 - **`Delete` retira o acesso**, não apaga: a pessoa continua no histórico dos chamados e volta com
   `Access: false`. Um `Upsert` com `Access: bfocus.Bool(true)` devolve o acesso.
 - `PersonParams` segue a regra de [só o que você passa muda](#como-os-métodos-funcionam) (`nil` é
