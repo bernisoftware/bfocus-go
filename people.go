@@ -40,6 +40,15 @@ func personPath(customerExternalID, personExternalID string) (string, error) {
 // campos informados mudam; params nil envia {"person": {}}. Status do resultado:
 // "created", "updated" ou "unchanged". Access: Bool(true) devolve o acesso retirado por
 // Delete.
+//
+// CustomFields é a exceção ao "só o que vier muda": quando a lista vai (não nil), ela
+// SUBSTITUI a lista inteira de campos personalizados da pessoa — campo que ficar de fora é
+// REMOVIDO. Mande o que o seu sistema tem hoje, ou deixe nil.
+//
+// Clear APAGA contato ("email", "phone" ou os dois) e não se confunde com ClearFields, que
+// manda o campo como null — e em pessoa null quer dizer "não mexe". Campo fora da lista
+// aceita: ErrValidation com Code PERSON_CLEAR_FIELD_INVALID. Clear por um identificador
+// EXTRA: ErrConflict com Code PERSON_CLEAR_NOT_OWN_RECORD (só se limpa a própria ficha).
 func (s *PeopleService) Upsert(ctx context.Context, customerExternalID, personExternalID string, params *PersonParams, opts ...RequestOption) (*PersonUpsertResult, error) {
 	path, err := personPath(customerExternalID, personExternalID)
 	if err != nil {
@@ -130,6 +139,22 @@ func personIdentifierPath(personExternalID, extraID string) (string, error) {
 		return "", err
 	}
 	return "/people/" + person + "/identifiers/" + extra, nil
+}
+
+// List devolve TODOS os identificadores da pessoa — o principal (ExternalID do retorno) e os
+// extras — GET /people/{person_external_id}/identifiers. Escopo customers:read. Aceita no
+// caminho o principal OU qualquer um dos extras. Pessoa inexistente: ErrNotFound com Code
+// PERSON_NOT_FOUND.
+//
+// É a fonte de verdade para RECONCILIAR: People.List mostra só o identificador principal,
+// então um id que virou extra some de lá sem ter sumido do cadastro — e, sem esta leitura,
+// era preciso ESCREVER (tentar um Add) para descobrir o que tinha acontecido.
+func (s *PersonIdentifiersService) List(ctx context.Context, personExternalID string) (*PersonIdentifiers, error) {
+	person, err := segment("personExternalID", personExternalID)
+	if err != nil {
+		return nil, err
+	}
+	return callObject[PersonIdentifiers](ctx, s.client, apiRequest{method: http.MethodGet, path: "/people/" + person + "/identifiers"})
 }
 
 // Add liga o identificador extraID à pessoa (idempotente) — PUT

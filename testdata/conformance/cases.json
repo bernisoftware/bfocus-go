@@ -1021,6 +1021,14 @@
                 "access": true,
                 "is_primary": true,
                 "customer_external_id": "ERP 1042",
+                "custom_fields": [
+                  {
+                    "key": "matricula",
+                    "label": "Matrícula",
+                    "value": "4471",
+                    "visibility": "interno"
+                  }
+                ],
                 "status": "created"
               },
               "message": "Executado com sucesso"
@@ -1038,6 +1046,14 @@
           "access": true,
           "is_primary": true,
           "customer_external_id": "ERP 1042",
+          "custom_fields": [
+            {
+              "key": "matricula",
+              "label": "Matrícula",
+              "value": "4471",
+              "visibility": "interno"
+            }
+          ],
           "status": "created"
         }
       }
@@ -1085,6 +1101,14 @@
                 "access": false,
                 "is_primary": true,
                 "customer_external_id": "ERP 1042",
+                "custom_fields": [
+                  {
+                    "key": "matricula",
+                    "label": "Matrícula",
+                    "value": "4471",
+                    "visibility": "interno"
+                  }
+                ],
                 "status": "updated"
               },
               "message": "Executado com sucesso"
@@ -1102,6 +1126,14 @@
           "access": false,
           "is_primary": true,
           "customer_external_id": "ERP 1042",
+          "custom_fields": [
+            {
+              "key": "matricula",
+              "label": "Matrícula",
+              "value": "4471",
+              "visibility": "interno"
+            }
+          ],
           "status": "updated"
         }
       }
@@ -1181,7 +1213,15 @@
                   "role": "Financeiro",
                   "access": true,
                   "is_primary": true,
-                  "customer_external_id": "ERP 1042"
+                  "customer_external_id": "ERP 1042",
+                  "custom_fields": [
+                    {
+                      "key": "matricula",
+                      "label": "Matrícula",
+                      "value": "4471",
+                      "visibility": "interno"
+                    }
+                  ]
                 },
                 {
                   "external_id": null,
@@ -1191,7 +1231,8 @@
                   "role": "Compras",
                   "access": false,
                   "is_primary": false,
-                  "customer_external_id": "ERP 1042"
+                  "customer_external_id": "ERP 1042",
+                  "custom_fields": []
                 }
               ],
               "message": "Executado com sucesso"
@@ -1209,7 +1250,15 @@
             "role": "Financeiro",
             "access": true,
             "is_primary": true,
-            "customer_external_id": "ERP 1042"
+            "customer_external_id": "ERP 1042",
+            "custom_fields": [
+              {
+                "key": "matricula",
+                "label": "Matrícula",
+                "value": "4471",
+                "visibility": "interno"
+              }
+            ]
           },
           {
             "external_id": null,
@@ -1219,7 +1268,8 @@
             "role": "Compras",
             "access": false,
             "is_primary": false,
-            "customer_external_id": "ERP 1042"
+            "customer_external_id": "ERP 1042",
+            "custom_fields": []
           }
         ]
       }
@@ -1253,7 +1303,15 @@
                 "role": "Financeiro",
                 "access": false,
                 "is_primary": true,
-                "customer_external_id": "ERP 1042"
+                "customer_external_id": "ERP 1042",
+                "custom_fields": [
+                  {
+                    "key": "matricula",
+                    "label": "Matrícula",
+                    "value": "4471",
+                    "visibility": "interno"
+                  }
+                ]
               },
               "message": "Acesso retirado"
             }
@@ -1269,7 +1327,15 @@
           "role": "Financeiro",
           "access": false,
           "is_primary": true,
-          "customer_external_id": "ERP 1042"
+          "customer_external_id": "ERP 1042",
+          "custom_fields": [
+            {
+              "key": "matricula",
+              "label": "Matrícula",
+              "value": "4471",
+              "visibility": "interno"
+            }
+          ]
         }
       }
     },
@@ -1788,6 +1854,54 @@
           "request": {
             "method": "PUT",
             "path": "/api/v1/integration/people/app-77/identifiers/crm-p5",
+            "query": {},
+            "body": null
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "external_id": "app-77",
+                "identifiers": [
+                  {
+                    "external_id": "crm-p5",
+                    "label": null,
+                    "source": "api"
+                  }
+                ]
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "external_id": "app-77",
+          "identifiers": [
+            {
+              "external_id": "crm-p5",
+              "label": null,
+              "source": "api"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "people.identifiers.list/by_extra",
+      "op": "people.identifiers.list",
+      "args": {
+        "person_external_id": "crm-p5"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/integration/people/crm-p5/identifiers",
             "query": {},
             "body": null
           },

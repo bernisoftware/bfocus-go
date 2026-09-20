@@ -304,6 +304,10 @@ var conformanceOps = map[string]opFunc{
 		}
 		return ret(c.People.Batch(ctx, items))
 	},
+	"people.identifiers.list": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
+		a.only("person_external_id")
+		return ret(c.People.Identifiers.List(ctx, a.str("person_external_id")))
+	},
 	"people.identifiers.add": func(ctx context.Context, c *Client, a caseArgs) (any, error) {
 		return ret(c.People.Identifiers.Add(ctx, a.str("person_external_id"), a.str("extra_id"),
 			params[IdentifierParams](a, "person_external_id", "extra_id")))

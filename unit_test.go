@@ -1181,6 +1181,33 @@ func TestValidationError(t *testing.T) {
 	}
 }
 
+func TestErrorDataCarriesContactOwner(t *testing.T) {
+	// 409 acionável: Data diz de QUEM é o contato (e a API repete em Validation).
+	srv := newFakeServer(t)
+	c, _ := newTestClient(t, srv, []fakeResponse{
+		raw(409, `{"code":409,"data":{"field":"email","owner_external_id":"app-12","owner_name":"Paula Reis","owner_customer_external_id":"erp-1042"},`+
+			`"message":"PERSON_EMAIL_TAKEN","error":"PERSON_EMAIL_TAKEN","validation":{"field":"email","owner_external_id":"app-12"},"request_id":"r1"}`, nil),
+		raw(404, `{"code":404,"data":null,"error":"CUSTOMER_NOT_FOUND"}`, nil),
+	})
+	_, err := c.People.Upsert(context.Background(), "erp-1042", "app-77", &PersonParams{Email: String("paula@padaria.example")})
+	e := apiErr(t, err)
+	if !errors.Is(err, ErrConflict) || e.Code != "PERSON_EMAIL_TAKEN" {
+		t.Fatalf("erro %v", err)
+	}
+	if e.Data["owner_external_id"] != "app-12" || e.Data["owner_customer_external_id"] != "erp-1042" ||
+		e.Data["owner_name"] != "Paula Reis" || e.Data["field"] != "email" {
+		t.Errorf("Data %v", e.Data)
+	}
+	if e.Validation["owner_external_id"] != "app-12" {
+		t.Errorf("Validation %v", e.Validation)
+	}
+
+	_, err = c.Customers.Get(context.Background(), "erp-1042")
+	if e := apiErr(t, err); e.Data != nil {
+		t.Errorf("sem detalhe, Data devia ser nil: %v", e.Data)
+	}
+}
+
 func TestInvalidSuccessBodyIsInvalidResponse(t *testing.T) {
 	srv := newFakeServer(t)
 	bodies := []fakeResponse{
@@ -1264,7 +1291,10 @@ func TestUnknownResponseFieldsAreIgnoredOrPreserved(t *testing.T) {
 	if f.Key != "plano" || f.Type != "text" || f.Visibility != "interno" || f.Value != float64(3) || string(f.Extra["cor"]) != `"azul"` {
 		t.Errorf("campo personalizado %+v", f)
 	}
-	if b := string(mustJSON(f)); !strings.Contains(b, `"cor":"azul"`) || !strings.Contains(b, `"visibility":"interno"`) {
+	// O que a API mandou volta igual, inclusive o que a SDK não conhece; o que ela NÃO
+	// mandou não é inventado de volta (campo personalizado de pessoa vem sem `type`, e o
+	// JSON do modelo precisa bater com a resposta — só a leitura assume o padrão da spec).
+	if b := string(mustJSON(f)); !strings.Contains(b, `"cor":"azul"`) || strings.Contains(b, `"visibility"`) || strings.Contains(b, `"type"`) {
 		t.Errorf("Extra volta no JSON: %s", b)
 	}
 

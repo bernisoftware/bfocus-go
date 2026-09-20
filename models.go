@@ -29,7 +29,7 @@ type Customer struct {
 	UpdatedAt    *time.Time    `json:"updated_at"`
 }
 
-// CustomField é um campo personalizado de um cliente, como a API guardou.
+// CustomField é um campo personalizado de um cliente ou de uma pessoa, como a API guardou.
 type CustomField struct {
 	Key   string  `json:"key"`
 	Label *string `json:"label"`
@@ -41,6 +41,11 @@ type CustomField struct {
 	Visibility string `json:"visibility"`
 	// Extra: demais chaves que a API enviar, como vieram.
 	Extra map[string]json.RawMessage `json:"-"`
+	// sent: chaves conhecidas que REALMENTE vieram no JSON (nil num campo montado à mão).
+	// Campo personalizado de PESSOA chega sem `type` — a API só guarda o que o seu sistema
+	// mandou, mais a visibilidade. A leitura assume o padrão da spec ("text"), mas a
+	// serialização não inventa de volta uma chave que a API não enviou.
+	sent map[string]bool
 }
 
 var customFieldKeys = jsonKeys(reflect.TypeOf(CustomField{}))
@@ -54,15 +59,40 @@ func (f *CustomField) UnmarshalJSON(b []byte) error {
 	if err != nil {
 		return err
 	}
+	var all map[string]json.RawMessage
+	if err := json.Unmarshal(b, &all); err != nil {
+		return err
+	}
+	sent := make(map[string]bool, len(customFieldKeys))
+	for _, k := range customFieldKeys {
+		if _, ok := all[k]; ok {
+			sent[k] = true
+		}
+	}
 	p.Extra = extra
+	p.sent = sent
 	*f = CustomField(p)
 	return nil
 }
 
-// MarshalJSON serializa os campos conhecidos mais Extra.
+// MarshalJSON serializa os campos conhecidos mais Extra. Num campo que veio da API, só as
+// chaves que ela enviou (round-trip fiel); num campo montado no seu código, todas.
 func (f CustomField) MarshalJSON() ([]byte, error) {
 	type plain CustomField
-	return encodeWithExtra(plain(f), f.Extra)
+	base, err := encodeWithExtra(plain(f), f.Extra)
+	if err != nil || f.sent == nil {
+		return base, err
+	}
+	var all map[string]json.RawMessage
+	if err := json.Unmarshal(base, &all); err != nil {
+		return nil, err
+	}
+	for _, k := range customFieldKeys {
+		if !f.sent[k] {
+			delete(all, k)
+		}
+	}
+	return json.Marshal(all)
 }
 
 // Contact é um contato de um cliente.
@@ -296,6 +326,8 @@ type Person struct {
 	IsPrimary bool `json:"is_primary"`
 	// CustomerExternalID: external_id principal do cliente a que a pessoa pertence.
 	CustomerExternalID string `json:"customer_external_id"`
+	// CustomFields: campos personalizados da pessoa (Visibility vem definida no bFocus).
+	CustomFields []CustomField `json:"custom_fields"`
 }
 
 // PersonUpsertResult é o retorno de People.Upsert: a pessoa + o que aconteceu.

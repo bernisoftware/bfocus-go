@@ -65,8 +65,9 @@ type CustomerUpsertParams struct {
 	ClearFields []string `json:"-"`
 }
 
-// CustomFieldInput é um campo personalizado enviado em CustomerUpsertParams.CustomFields.
-// Campos vazios não vão no corpo (a API assume label "" e type "text").
+// CustomFieldInput é um campo personalizado enviado em CustomerUpsertParams.CustomFields ou
+// em PersonParams.CustomFields. Campos vazios não vão no corpo (a API assume label "" e type
+// "text"). A visibilidade NÃO se envia por aqui: quem vê o campo é decisão do bFocus.
 type CustomFieldInput struct {
 	// Key: chave estável do campo (1–80). Obrigatória.
 	Key string `json:"key"`
@@ -179,7 +180,21 @@ type PersonParams struct {
 	ExtraEmails []string `json:"extra_emails,omitempty"`
 	// ExtraPhones: telefones adicionais (somam aos que já existem).
 	ExtraPhones []string `json:"extra_phones,omitempty"`
-	// ClearFields: campos a enviar como null.
+	// CustomFields: campos personalizados da pessoa. Ao contrário de ExtraEmails/ExtraPhones,
+	// quando enviada (não nil) a lista SUBSTITUI a atual — campo que ficar de fora é
+	// REMOVIDO; []bfocus.CustomFieldInput{} apaga todos. Deixar nil não mexe em nada. A
+	// visibilidade é decidida no bFocus e preservada entre sincronizações.
+	CustomFields []CustomFieldInput `json:"custom_fields,omitempty"`
+	// Clear: campos a APAGAR nesta pessoa — "email", "phone" ou os dois.
+	//
+	// NÃO é o ClearFields abaixo: aquele manda o campo como null, e em PESSOA null quer
+	// dizer "não mexe". Apagar é EXPLÍCITO de propósito — nil, lista vazia e null continuam
+	// significando "não mexe", e a SDK não traduz null em Clear. Campo fora da lista aceita
+	// é RECUSADO pela API (422 PERSON_CLEAR_FIELD_INVALID), não ignorado; e só se limpa a
+	// PRÓPRIA ficha: alcançando a pessoa por um identificador EXTRA, a API recusa (409
+	// PERSON_CLEAR_NOT_OWN_RECORD).
+	Clear []string `json:"clear,omitempty"`
+	// ClearFields: campos a enviar como null. Em pessoa, null NÃO apaga contato — use Clear.
 	ClearFields []string `json:"-"`
 }
 
@@ -207,7 +222,13 @@ type PersonBatchItem struct {
 	ExtraEmails []string `json:"extra_emails,omitempty"`
 	// ExtraPhones: telefones adicionais (somam aos que já existem).
 	ExtraPhones []string `json:"extra_phones,omitempty"`
-	// ClearFields: campos a enviar como null.
+	// CustomFields: campos personalizados da pessoa. Quando enviada (não nil), a lista
+	// SUBSTITUI a atual — campo que ficar de fora é REMOVIDO.
+	CustomFields []CustomFieldInput `json:"custom_fields,omitempty"`
+	// Clear: campos a APAGAR nesta pessoa ("email", "phone" ou os dois). Ver PersonParams.Clear:
+	// apagar é explícito, e ClearFields (null) NÃO apaga contato de pessoa.
+	Clear []string `json:"clear,omitempty"`
+	// ClearFields: campos a enviar como null. Em pessoa, null NÃO apaga contato — use Clear.
 	ClearFields []string `json:"-"`
 }
 

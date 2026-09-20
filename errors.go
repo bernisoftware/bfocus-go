@@ -65,6 +65,12 @@ type Error struct {
 	RequestID string
 	// Validation: campo → motivo, nos erros de validação (nil nos demais).
 	Validation map[string]string
+	// Data é o `data` do corpo do erro: o detalhe estruturado que alguns erros trazem (nil
+	// nos demais). É onde vem, por exemplo, de quem é o contato já usado num 409
+	// PERSON_EMAIL_TAKEN/PERSON_PHONE_TAKEN (field, owner_external_id, owner_name,
+	// owner_customer_external_id) e o owner de um IDENTIFIER_IN_USE. A API repete esse
+	// detalhe em Validation, por compatibilidade com as SDKs que ainda não expunham Data.
+	Data map[string]any
 	// RetryAfter: espera pedida pela API no header Retry-After (só em 429; 0 nos demais).
 	RetryAfter time.Duration
 	// RequiredScope: escopo que faltou na chave, do header X-Required-Scope (só em 403 de
@@ -155,12 +161,19 @@ func typeForStatus(status int) ErrorType {
 func errorFromResponse(status int, raw []byte, header http.Header, wait *time.Duration, sentRequestID string) *Error {
 	var code, bodyMessage, requestID string
 	var validation map[string]string
+	var data map[string]any
 
 	var body map[string]json.RawMessage
 	if json.Unmarshal(raw, &body) == nil && body != nil {
 		code = jsonString(body["error"])
 		bodyMessage = jsonString(body["message"])
 		requestID = jsonString(body["request_id"])
+		// `data`: o detalhe estruturado do erro. A API também o repete em `validation`, mas
+		// quem lê o erro precisa alcançá-lo sem depender dessa duplicação.
+		var detail map[string]any
+		if json.Unmarshal(body["data"], &detail) == nil && detail != nil {
+			data = detail
+		}
 		var fields map[string]json.RawMessage
 		if json.Unmarshal(body["validation"], &fields) == nil && len(fields) > 0 {
 			validation = make(map[string]string, len(fields))
@@ -223,6 +236,7 @@ func errorFromResponse(status int, raw []byte, header http.Header, wait *time.Du
 		Status:        status,
 		RequestID:     requestID,
 		Validation:    validation,
+		Data:          data,
 		RetryAfter:    retryAfter,
 		RequiredScope: requiredScope,
 	}

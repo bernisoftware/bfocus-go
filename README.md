@@ -213,7 +213,105 @@ client.People.Upsert(ctx, "erp-1042", "app-77", &bfocus.PersonParams{Access: bfo
 - `PersonParams` segue a regra de [só o que você passa muda](#como-os-métodos-funcionam) (`nil` é
   omitido; `ClearFields` envia `null`, que para pessoas significa "não altera").
 - E-mail de alguém da sua equipe: `ErrConflict` com `Code` `PERSON_EMAIL_STAFF`; pessoa inexistente
-  no `Delete`: `ErrNotFound` com `PERSON_NOT_FOUND`.
+  no `Delete`: `ErrNotFound` com `PERSON_NOT_FOUND`. Contato já usado: `PERSON_EMAIL_TAKEN`,
+  `PERSON_PHONE_TAKEN` ou `PERSON_CONTACT_OTHER_CUSTOMER` — veja logo abaixo. Ao apagar contato:
+  `PERSON_CLEAR_FIELD_INVALID` (422) e `PERSON_CLEAR_NOT_OWN_RECORD` (409).
+
+### Campos personalizados da pessoa
+
+`PersonParams.CustomFields` leva o que só existe no seu sistema (matrícula, centro de custo, filial). É a
+**exceção** ao "só o que vier muda": a lista enviada **substitui a lista inteira** — campo que
+ficar de fora é **removido**. Mande sempre a lista que o seu sistema tem hoje; deixá-lo `nil` não mexe
+em nada, como em qualquer outro campo.
+
+A `visibility` é decidida no bFocus e **preservada entre sincronizações** — por isso ela não vai
+no envio, só volta na resposta: o seu ERP não rebaixa nem promove a exposição de um dado sem
+querer.
+
+Vale no upsert de pessoa, no lote de pessoas e na listagem de pessoas do cliente.
+
+```go
+p, err := client.People.Upsert(ctx, "erp-1042", "app-77", &bfocus.PersonParams{
+	CustomFields: []bfocus.CustomFieldInput{ // a lista INTEIRA do seu sistema
+		{Key: "matricula", Label: "Matrícula", Value: "4471"},
+		{Key: "filial", Label: "Filial", Value: "Centro"},
+	},
+})
+for _, campo := range p.CustomFields {
+	fmt.Println(campo.Key, campo.Value, campo.Visibility) // Visibility vem do bFocus
+}
+```
+
+### Apagar o e-mail ou o telefone da pessoa
+
+Um contato gravado errado ficava preso para sempre: enquanto a ficha errada segurasse o telefone,
+nenhum reenvio o soltava. `PersonParams.Clear` apaga.
+
+```go
+client.People.Upsert(ctx, "erp-1042", "app-77", &bfocus.PersonParams{
+	Clear: []string{"phone"}, // ou []string{"email", "phone"}
+})
+```
+
+Três regras que parecem contraintuitivas e são de propósito:
+
+- **Apagar é explícito, e `Clear` é o único jeito.** `ClearFields: []string{"Phone"}` manda
+  `phone: null`, e em pessoa `null` (como `nil` e a lista vazia) quer dizer **"não mexe"** — a SDK
+  não traduz `null` em `Clear`. Fazer o `null` apagar teria apagado, em silêncio e na primeira carga
+  seguinte, o dado de todo sistema que manda `null` para "não tenho esse valor".
+- **Campo fora da lista é recusado, não ignorado**: hoje só `"email"` e `"phone"`; qualquer outro
+  volta `ErrValidation` com `Code` `PERSON_CLEAR_FIELD_INVALID`.
+- **Só se limpa a própria ficha.** Se você alcançou a pessoa por um identificador **extra**, volta
+  `ErrConflict` com `Code` `PERSON_CLEAR_NOT_OWN_RECORD`: apagar o contato de uma ficha alcançada por
+  apelido seria apagar dado de outro sistema. Para saber se o id que você tem em mãos é o principal
+  ou um extra, use `People.Identifiers.List`.
+
+Vale no `People.Upsert` e no `People.Batch` (`Clear` no item).
+
+### Contato já usado: um 409 que você consegue resolver
+
+`PERSON_EMAIL_TAKEN` e `PERSON_PHONE_TAKEN` (409) não são "tente de novo": o e-mail (ou o
+telefone) já é de outra pessoa da conta. O erro diz **de quem**, em `Data` (a API repete o mesmo
+detalhe em `Validation`, por compatibilidade):
+
+| campo | o que é |
+| --- | --- |
+| `field` | `email` ou `phone` — qual contato está tomado |
+| `owner_external_id` | o identificador da pessoa que já usa esse contato |
+| `owner_name` | o nome dela |
+| `owner_customer_external_id` | o cliente a que ela pertence |
+
+**É o `owner_customer_external_id` que decide a ação**, e os dois casos pedem coisas opostas:
+
+- **mesmo cliente que você enviou** → é quase sempre a MESMA pessoa em dois sistemas. Uma pessoa
+  tem **N identificadores**: registre o seu como **extra** dela. A partir daí o seu id encontra
+  essa pessoa.
+- **outro cliente** → ninguém decide sozinho a quem a pessoa pertence. Não force: registre o caso
+  e leve para quem conhece o cadastro. Unificar dois clientes é decisão de gente, não de um
+  casamento por e-mail.
+
+```go
+_, err := client.People.Upsert(ctx, "erp-1042", "app-77", &bfocus.PersonParams{
+	Name:  bfocus.String("Paula Reis"),
+	Email: bfocus.String("paula@padaria.example"),
+})
+var e *bfocus.Error
+if errors.As(err, &e) && (e.Code == "PERSON_EMAIL_TAKEN" || e.Code == "PERSON_PHONE_TAKEN") {
+	dono, _ := e.Data["owner_external_id"].(string)
+	if e.Data["owner_customer_external_id"] == "erp-1042" {
+		// A mesma pessoa, com dois ids: o seu vira mais um identificador dela.
+		_, err = client.People.Identifiers.Add(ctx, dono, "app-77", &bfocus.IdentifierParams{Label: bfocus.String("ERP")})
+	} else {
+		// Dono em OUTRO cliente: não decida sozinho — registre e leve para o cadastro.
+		avisarCadastro(e.Code, e.Data)
+	}
+}
+```
+
+`PERSON_CONTACT_OTHER_CUSTOMER` (409) é o mesmo assunto pelo outro lado, e é **recusa
+definitiva**: a API não move mais uma pessoa de um cliente para outro só porque o e-mail (ou o
+telefone) casou. Repetir a chamada não resolve — trate como caso para o cadastro, nunca como
+falha temporária.
 
 ## Lotes — clientes e pessoas
 
@@ -282,6 +380,24 @@ client.People.Identifiers.Remove(ctx, "app-77", "crm-p5")
 `IDENTIFIER_IN_USE`; `Remove` de um id que não está ligado volta `ErrNotFound` com
 `IDENTIFIER_NOT_FOUND`. Depois de ligado, o id extra funciona nas outras chamadas e nos lotes — o
 resultado traz o principal em `MergedInto`.
+
+### Ler os identificadores da pessoa (para reconciliar)
+
+`People.List` mostra só o identificador **principal** de cada pessoa. Quando dois cadastros seus
+eram a mesma pessoa, um dos ids virou **extra** — e some da listagem sem ter sumido do cadastro. É
+isso que faz a sua conferência fechar "633 de 636" sem explicar os 3.
+
+`People.Identifiers.List` é a fonte de verdade dessa conferência, e é **leitura**: antes dela era
+preciso ESCREVER (tentar um `Add`) para descobrir o que tinha acontecido. Aceita no caminho o id
+principal **ou qualquer um dos extras**.
+
+```go
+ids, err := client.People.Identifiers.List(ctx, "crm-p5") // o id extra que "sumiu" da listagem
+fmt.Println(ids.ExternalID)                               // app-77 — o principal do cadastro
+for _, i := range ids.Identifiers {
+	fmt.Println(i.ExternalID, i.Source)
+}
+```
 
 ## Sincronizar clientes e usuários do seu sistema
 
@@ -541,7 +657,9 @@ fmt.Println(resposta.Action, resposta.AnswerHTML, resposta.Sources)
 ## Erros
 
 Qualquer resposta fora de 2xx devolve um `*bfocus.Error` com `Code`, `Message`, `Status`,
-`RequestID`, `Validation`, `RetryAfter` e `RequiredScope`. O tipo sai do status, e cada um tem um
+`RequestID`, `Validation`, `Data`, `RetryAfter` e `RequiredScope`. O `Data` é o `data` do corpo: o
+detalhe estruturado que alguns erros trazem (`nil` quando não há) — é por ele que um 409 de contato
+tomado diz de **quem** é o contato (veja [Pessoas](#pessoas)). O tipo sai do status, e cada um tem um
 sentinela para `errors.Is`:
 
 | Sentinela (`errors.Is`) | `Type` | Quando |
