@@ -45,10 +45,19 @@ func requestOpts(opts []RequestOption) requestOptions {
 // Parcial: campo nil é omitido (fica como está); para limpar (enviar null), ponha o nome
 // em ClearFields.
 type CustomerUpsertParams struct {
-	// Name: nome (até 500).
+	// Name: nome (até 500). Na PJ, o nome fantasia — a razão social vai em LegalName.
 	Name *string `json:"name,omitempty"`
 	// Document: CPF/CNPJ ou outro documento (até 50).
 	Document *string `json:"document,omitempty"`
+	// Kind: tipo do CONTRATANTE — "pj" (empresa) ou "pf" (pessoa física). Não enviando, o
+	// bFocus deduz do documento.
+	Kind *string `json:"kind,omitempty"`
+	// LegalName, StateRegistration, MunicipalRegistration: só PJ (razão social e inscrições).
+	LegalName             *string `json:"legal_name,omitempty"`
+	StateRegistration     *string `json:"state_registration,omitempty"`
+	MunicipalRegistration *string `json:"municipal_registration,omitempty"`
+	// IDDocument: só PF — RG e órgão emissor.
+	IDDocument *string `json:"id_document,omitempty"`
 	// Email: e-mail (até 255).
 	Email *string `json:"email,omitempty"`
 	// Phone: telefone (até 50).

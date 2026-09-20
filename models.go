@@ -16,8 +16,18 @@ type Customer struct {
 	// ID no bFocus (UUID).
 	ID string `json:"id"`
 	// ExternalID: id do cliente no seu sistema.
-	ExternalID   string        `json:"external_id"`
-	Name         string        `json:"name"`
+	ExternalID string `json:"external_id"`
+	// Name: o nome usado em tudo. Na PJ é o nome fantasia (a razão social fica em LegalName).
+	Name string `json:"name"`
+	// Kind: tipo do CONTRATANTE — "pj" (empresa) ou "pf" (pessoa física); nil quando não dá
+	// para saber. Cliente é a CONTA, não a pessoa: uma conta PF pode ter várias pessoas dentro.
+	Kind *string `json:"kind"`
+	// LegalName, StateRegistration, MunicipalRegistration: só PJ.
+	LegalName             *string `json:"legal_name"`
+	StateRegistration     *string `json:"state_registration"`
+	MunicipalRegistration *string `json:"municipal_registration"`
+	// IDDocument: só PF — RG e órgão emissor (texto livre, varia por estado).
+	IDDocument   *string       `json:"id_document"`
 	Document     *string       `json:"document"`
 	Email        *string       `json:"email"`
 	Phone        *string       `json:"phone"`
