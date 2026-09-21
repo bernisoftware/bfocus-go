@@ -50,6 +50,11 @@ func personPath(customerExternalID, personExternalID string) (string, error) {
 // manda o campo como null — e em pessoa null quer dizer "não mexe". Campo fora da lista
 // aceita: ErrValidation com Code PERSON_CLEAR_FIELD_INVALID. Clear por um identificador
 // EXTRA: ErrConflict com Code PERSON_CLEAR_NOT_OWN_RECORD (só se limpa a própria ficha).
+//
+// Document é o CPF, e a pessoa é ÚNICA: o mesmo CPF é sempre o mesmo cadastro. Id
+// desconhecido + CPF existente → MergedInto com o id principal; id de uma ficha + CPF de
+// outra → as duas são mescladas na hora. nil não apaga. Erros: PERSON_DOCUMENT_INVALID
+// (ErrValidation) e PERSON_DOCUMENT_CONFLICT (ErrConflict: a ficha já tem outro CPF).
 func (s *PeopleService) Upsert(ctx context.Context, customerExternalID, personExternalID string, params *PersonParams, opts ...RequestOption) (*PersonUpsertResult, error) {
 	path, err := personPath(customerExternalID, personExternalID)
 	if err != nil {

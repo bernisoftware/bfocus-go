@@ -186,6 +186,15 @@ type PersonParams struct {
 	Email *string `json:"email,omitempty"`
 	// Phone: telefone (também identifica a pessoa já cadastrada).
 	Phone *string `json:"phone,omitempty"`
+	// Document: CPF da pessoa, com ou sem máscara (a resposta traz só os 11 dígitos).
+	//
+	// A PESSOA É ÚNICA: o mesmo CPF é sempre o mesmo cadastro, em qualquer produto. Id
+	// desconhecido + CPF de uma ficha existente → MergedInto = id principal dela (o seu id vira
+	// identificador extra). Id de uma ficha + CPF de OUTRA → as duas são mescladas na hora
+	// (MergedInto = a que tinha o CPF). nil/null/vazio NÃO apaga (não é campo do Clear).
+	// Erros: ErrValidation com Code PERSON_DOCUMENT_INVALID (CPF inválido) e ErrConflict com
+	// Code PERSON_DOCUMENT_CONFLICT (a ficha já tem OUTRO CPF — nunca troca sozinho).
+	Document *string `json:"document,omitempty"`
 	// Role: cargo/função no cliente (ex.: "Financeiro").
 	Role *string `json:"role,omitempty"`
 	// Access: acesso ao widget/portal (padrão ao criar: true). false retira o acesso;
@@ -229,6 +238,9 @@ type PersonBatchItem struct {
 	Email *string `json:"email,omitempty"`
 	// Phone: telefone.
 	Phone *string `json:"phone,omitempty"`
+	// Document: CPF da pessoa (com ou sem máscara). Ver PersonParams.Document: o mesmo CPF é
+	// sempre o mesmo cadastro, e nil/vazio não apaga.
+	Document *string `json:"document,omitempty"`
 	// Role: cargo/função no cliente.
 	Role *string `json:"role,omitempty"`
 	// Access: acesso ao widget/portal (padrão ao criar: true).

@@ -335,7 +335,9 @@ type Person struct {
 	Name       string  `json:"name"`
 	Email      *string `json:"email"`
 	Phone      *string `json:"phone"`
-	Role       *string `json:"role"`
+	// Document: CPF da pessoa, só os 11 dígitos (nil = não informado).
+	Document *string `json:"document"`
+	Role     *string `json:"role"`
 	// Access: pode abrir o widget/portal do cliente.
 	Access    bool `json:"access"`
 	IsPrimary bool `json:"is_primary"`

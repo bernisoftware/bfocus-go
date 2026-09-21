@@ -1295,6 +1295,7 @@
                 "name": "Paula Reis",
                 "email": "paula@padaria.example",
                 "phone": null,
+                "document": null,
                 "role": "Financeiro",
                 "access": true,
                 "is_primary": true,
@@ -1323,6 +1324,7 @@
           "name": "Paula Reis",
           "email": "paula@padaria.example",
           "phone": null,
+          "document": null,
           "role": "Financeiro",
           "access": true,
           "is_primary": true,
@@ -1381,6 +1383,7 @@
                 "name": "Paula Reis",
                 "email": "paula@padaria.example",
                 "phone": null,
+                "document": null,
                 "role": "Financeiro",
                 "access": false,
                 "is_primary": true,
@@ -1409,6 +1412,7 @@
           "name": "Paula Reis",
           "email": "paula@padaria.example",
           "phone": null,
+          "document": null,
           "role": "Financeiro",
           "access": false,
           "is_primary": true,
@@ -1475,6 +1479,199 @@
       }
     },
     {
+      "id": "people.upsert/document_merged",
+      "op": "people.upsert",
+      "args": {
+        "customer_external_id": "ERP 1042",
+        "person_external_id": "app-91",
+        "name": "Paula Reis",
+        "document": "529.982.247-25"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/people/app-91",
+            "query": {},
+            "body": {
+              "person": {
+                "name": "Paula Reis",
+                "document": "529.982.247-25"
+              }
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "external_id": "app-77",
+                "name": "Paula Reis",
+                "email": "paula@padaria.example",
+                "phone": null,
+                "document": "52998224725",
+                "role": "Financeiro",
+                "access": true,
+                "is_primary": true,
+                "customer_external_id": "ERP 1042",
+                "custom_fields": [
+                  {
+                    "key": "matricula",
+                    "label": "Matrícula",
+                    "value": "4471",
+                    "visibility": "interno"
+                  }
+                ],
+                "identifiers": [
+                  {
+                    "external_id": "app-91",
+                    "label": null,
+                    "source": "api"
+                  }
+                ],
+                "linked": false,
+                "merged_into": "app-77",
+                "status": "updated"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "external_id": "app-77",
+          "name": "Paula Reis",
+          "email": "paula@padaria.example",
+          "phone": null,
+          "document": "52998224725",
+          "role": "Financeiro",
+          "access": true,
+          "is_primary": true,
+          "customer_external_id": "ERP 1042",
+          "custom_fields": [
+            {
+              "key": "matricula",
+              "label": "Matrícula",
+              "value": "4471",
+              "visibility": "interno"
+            }
+          ],
+          "identifiers": [
+            {
+              "external_id": "app-91",
+              "label": null,
+              "source": "api"
+            }
+          ],
+          "linked": false,
+          "merged_into": "app-77",
+          "status": "updated"
+        }
+      }
+    },
+    {
+      "id": "people.upsert/document_conflict",
+      "op": "people.upsert",
+      "args": {
+        "customer_external_id": "ERP 1042",
+        "person_external_id": "app-77",
+        "document": "111.444.777-35"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/people/app-77",
+            "query": {},
+            "body": {
+              "person": {
+                "document": "111.444.777-35"
+              }
+            }
+          },
+          "response": {
+            "status": 409,
+            "headers": {},
+            "body": {
+              "code": 409,
+              "data": {
+                "field": "document"
+              },
+              "message": "PERSON_DOCUMENT_CONFLICT",
+              "error": "PERSON_DOCUMENT_CONFLICT",
+              "validation": {
+                "field": "document"
+              },
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "conflict",
+          "code": "PERSON_DOCUMENT_CONFLICT",
+          "status": 409,
+          "request_id": "req-conformance-01"
+        }
+      }
+    },
+    {
+      "id": "people.upsert/document_invalid",
+      "op": "people.upsert",
+      "args": {
+        "customer_external_id": "ERP 1042",
+        "person_external_id": "app-77",
+        "document": "123.456.789-00"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042/people/app-77",
+            "query": {},
+            "body": {
+              "person": {
+                "document": "123.456.789-00"
+              }
+            }
+          },
+          "response": {
+            "status": 422,
+            "headers": {},
+            "body": {
+              "code": 422,
+              "data": {
+                "field": "document"
+              },
+              "message": "PERSON_DOCUMENT_INVALID",
+              "error": "PERSON_DOCUMENT_INVALID",
+              "validation": {
+                "field": "document"
+              },
+              "request_id": "req-conformance-01"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "error": {
+          "type": "validation",
+          "code": "PERSON_DOCUMENT_INVALID",
+          "status": 422,
+          "request_id": "req-conformance-01",
+          "validation": {
+            "field": "document"
+          }
+        }
+      }
+    },
+    {
       "id": "people.list/ok",
       "op": "people.list",
       "args": {
@@ -1500,6 +1697,7 @@
                   "name": "Paula Reis",
                   "email": "paula@padaria.example",
                   "phone": null,
+                  "document": null,
                   "role": "Financeiro",
                   "access": true,
                   "is_primary": true,
@@ -1519,6 +1717,7 @@
                   "name": "Rui Lima",
                   "email": null,
                   "phone": "+5511999990000",
+                  "document": null,
                   "role": "Compras",
                   "access": false,
                   "is_primary": false,
@@ -1539,6 +1738,7 @@
             "name": "Paula Reis",
             "email": "paula@padaria.example",
             "phone": null,
+            "document": null,
             "role": "Financeiro",
             "access": true,
             "is_primary": true,
@@ -1558,6 +1758,7 @@
             "name": "Rui Lima",
             "email": null,
             "phone": "+5511999990000",
+            "document": null,
             "role": "Compras",
             "access": false,
             "is_primary": false,
@@ -1594,6 +1795,7 @@
                 "name": "Paula Reis",
                 "email": "paula@padaria.example",
                 "phone": null,
+                "document": null,
                 "role": "Financeiro",
                 "access": false,
                 "is_primary": true,
@@ -1620,6 +1822,7 @@
           "name": "Paula Reis",
           "email": "paula@padaria.example",
           "phone": null,
+          "document": null,
           "role": "Financeiro",
           "access": false,
           "is_primary": true,
@@ -2044,6 +2247,120 @@
           "summary": {
             "created": 0,
             "updated": 0,
+            "unchanged": 0,
+            "error": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "people.batch/document",
+      "op": "people.batch",
+      "args": {
+        "items": [
+          {
+            "customer_external_id": "ERP 1042",
+            "external_id": "app-77",
+            "document": "529.982.247-25"
+          },
+          {
+            "customer_external_id": "ERP 1042",
+            "external_id": "app-91",
+            "name": "Paula Reis",
+            "document": "52998224725"
+          }
+        ]
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/people/batch",
+            "query": {},
+            "body": {
+              "items": [
+                {
+                  "customer_external_id": "ERP 1042",
+                  "person": {
+                    "external_id": "app-77",
+                    "document": "529.982.247-25"
+                  }
+                },
+                {
+                  "customer_external_id": "ERP 1042",
+                  "person": {
+                    "external_id": "app-91",
+                    "name": "Paula Reis",
+                    "document": "52998224725"
+                  }
+                }
+              ]
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "results": [
+                  {
+                    "index": 0,
+                    "status": "updated",
+                    "external_id": "app-77",
+                    "merged_into": null,
+                    "linked": false,
+                    "error": null,
+                    "code": null
+                  },
+                  {
+                    "index": 1,
+                    "status": "updated",
+                    "external_id": "app-77",
+                    "merged_into": "app-77",
+                    "linked": false,
+                    "error": null,
+                    "code": null
+                  }
+                ],
+                "summary": {
+                  "created": 0,
+                  "updated": 2,
+                  "unchanged": 0,
+                  "error": 0
+                }
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "results": [
+            {
+              "index": 0,
+              "status": "updated",
+              "external_id": "app-77",
+              "merged_into": null,
+              "linked": false,
+              "error": null,
+              "code": null
+            },
+            {
+              "index": 1,
+              "status": "updated",
+              "external_id": "app-77",
+              "merged_into": "app-77",
+              "linked": false,
+              "error": null,
+              "code": null
+            }
+          ],
+          "summary": {
+            "created": 0,
+            "updated": 2,
             "unchanged": 0,
             "error": 0
           }

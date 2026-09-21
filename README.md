@@ -218,7 +218,8 @@ client.People.Upsert(ctx, "erp-1042", "app-77", &bfocus.PersonParams{Access: bfo
 - E-mail de alguém da sua equipe: `ErrConflict` com `Code` `PERSON_EMAIL_STAFF`; pessoa inexistente
   no `Delete`: `ErrNotFound` com `PERSON_NOT_FOUND`. Contato já usado: `PERSON_EMAIL_TAKEN`,
   `PERSON_PHONE_TAKEN` ou `PERSON_CONTACT_OTHER_CUSTOMER` — veja logo abaixo. Ao apagar contato:
-  `PERSON_CLEAR_FIELD_INVALID` (422) e `PERSON_CLEAR_NOT_OWN_RECORD` (409).
+  `PERSON_CLEAR_FIELD_INVALID` (422) e `PERSON_CLEAR_NOT_OWN_RECORD` (409). CPF (`Document`):
+  `PERSON_DOCUMENT_INVALID` (422) e `PERSON_DOCUMENT_CONFLICT` (409).
 
 ### Campos personalizados da pessoa
 
@@ -271,6 +272,32 @@ Três regras que parecem contraintuitivas e são de propósito:
 
 Vale no `People.Upsert` e no `People.Batch` (`Clear` no item).
 
+### CPF: a pessoa é única
+
+`document` é o CPF da pessoa. É por ele que dois sistemas que conhecem a mesma pessoa por ids
+diferentes chegam ao MESMO cadastro.
+
+```go
+p, err := client.People.Upsert(ctx, "erp-1042", "app-91", &bfocus.PersonParams{
+	Name:     bfocus.String("Paula Reis"),
+	Document: bfocus.String("529.982.247-25"),
+})
+// *p.Document == "52998224725"; p.MergedInto != nil se o CPF já era de outra ficha
+```
+
+Regras (valem no upsert e no lote):
+
+- **A pessoa é única.** O mesmo CPF é sempre o mesmo cadastro, em qualquer produto e cliente. Mande
+  com ou sem máscara; a resposta traz só os 11 dígitos em `document`.
+- **Id desconhecido + CPF que já existe** → a API acha a ficha, o seu id vira identificador extra
+  dela e a resposta vem com `merged_into` = o id principal. Guarde esse id do seu lado.
+- **Id de uma ficha + CPF de OUTRA** → as duas são mescladas na hora; `merged_into` = a que tinha o CPF.
+- **`nil` (ou `ClearFields: []string{"Document"}`) NÃO apaga** o CPF (e `document` não é campo do `clear`). Omitir é o mesmo que "não mexe".
+- Erros: 422 `PERSON_DOCUMENT_INVALID` (CPF inválido, `ErrValidation`) e 409 `PERSON_DOCUMENT_CONFLICT` (a
+  ficha já tem OUTRO CPF — a API nunca troca sozinho; `ErrConflict`).
+
+No lote: `Document` no `PersonBatchItem`.
+
 ### Contato já usado: um 409 que você consegue resolver
 
 `PERSON_EMAIL_TAKEN` e `PERSON_PHONE_TAKEN` (409) não são "tente de novo": o e-mail (ou o
@@ -311,10 +338,13 @@ if errors.As(err, &e) && (e.Code == "PERSON_EMAIL_TAKEN" || e.Code == "PERSON_PH
 }
 ```
 
-`PERSON_CONTACT_OTHER_CUSTOMER` (409) é o mesmo assunto pelo outro lado, e é **recusa
-definitiva**: a API não move mais uma pessoa de um cliente para outro só porque o e-mail (ou o
-telefone) casou. Repetir a chamada não resolve — trate como caso para o cadastro, nunca como
-falha temporária.
+`PERSON_CONTACT_OTHER_CUSTOMER` (409) é o mesmo assunto pelo outro lado: o e-mail (ou o telefone) é
+de uma pessoa de **outro cliente**. A API **não liga duas fichas sozinha** só porque o contato casou
+— dois cadastros podem dividir um e-mail ou um telefone, e ligar por palpite já destruiu fichas.
+Repetir a chamada não resolve. Se for **mesmo a mesma pessoa** (confirme antes), o erro traz o dono
+nos dados, como os outros dois conflitos: registre o seu id como identificador extra da ficha dele
+(`owner_external_id`) e o próximo envio **liga** a pessoa ao seu cliente (`linked: true`), sem
+sobrescrever os dados da outra ficha.
 
 ## Lotes — clientes e pessoas
 
