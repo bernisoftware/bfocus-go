@@ -119,6 +119,188 @@
       }
     },
     {
+      "id": "customers.upsert/pj_fields",
+      "op": "customers.upsert",
+      "args": {
+        "external_id": "ERP 1042",
+        "kind": "pj",
+        "name": "Padaria Estrela",
+        "legal_name": "Estrela Panificação e Comércio Ltda",
+        "document": "12345678000190",
+        "state_registration": "ISENTO",
+        "municipal_registration": "1.234.567-8"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%201042",
+            "query": {},
+            "body": {
+              "kind": "pj",
+              "name": "Padaria Estrela",
+              "legal_name": "Estrela Panificação e Comércio Ltda",
+              "document": "12345678000190",
+              "state_registration": "ISENTO",
+              "municipal_registration": "1.234.567-8"
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000001",
+                "external_id": "ERP 1042",
+                "name": "Padaria Estrela",
+                "kind": "pj",
+                "legal_name": "Estrela Panificação e Comércio Ltda",
+                "state_registration": "ISENTO",
+                "municipal_registration": "1.234.567-8",
+                "id_document": null,
+                "document": "12345678000190",
+                "email": "contato@padaria.example",
+                "phone": null,
+                "website": null,
+                "notes": null,
+                "custom_fields": [
+                  {
+                    "key": "plano",
+                    "label": "Plano",
+                    "type": "text",
+                    "value": "ouro",
+                    "visibility": "interno"
+                  }
+                ],
+                "is_active": true,
+                "logo_url": null,
+                "extra_emails": [],
+                "extra_phones": [],
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "external_id": "ERP 1042",
+          "name": "Padaria Estrela",
+          "kind": "pj",
+          "legal_name": "Estrela Panificação e Comércio Ltda",
+          "state_registration": "ISENTO",
+          "municipal_registration": "1.234.567-8",
+          "id_document": null,
+          "document": "12345678000190",
+          "email": "contato@padaria.example",
+          "phone": null,
+          "website": null,
+          "notes": null,
+          "custom_fields": [
+            {
+              "key": "plano",
+              "label": "Plano",
+              "type": "text",
+              "value": "ouro",
+              "visibility": "interno"
+            }
+          ],
+          "is_active": true,
+          "logo_url": null,
+          "extra_emails": [],
+          "extra_phones": [],
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
+      "id": "customers.upsert/pf_fields",
+      "op": "customers.upsert",
+      "args": {
+        "external_id": "ERP 2001",
+        "kind": "pf",
+        "name": "João da Silva",
+        "document": "52998224725",
+        "id_document": "MG-12.345.678 SSP/MG"
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "PUT",
+            "path": "/api/v1/integration/customers/ERP%202001",
+            "query": {},
+            "body": {
+              "kind": "pf",
+              "name": "João da Silva",
+              "document": "52998224725",
+              "id_document": "MG-12.345.678 SSP/MG"
+            }
+          },
+          "response": {
+            "status": 201,
+            "headers": {},
+            "body": {
+              "code": 201,
+              "data": {
+                "id": "00000000-0000-4000-8000-000000000003",
+                "external_id": "ERP 2001",
+                "name": "João da Silva",
+                "kind": "pf",
+                "legal_name": null,
+                "state_registration": null,
+                "municipal_registration": null,
+                "id_document": "MG-12.345.678 SSP/MG",
+                "document": "52998224725",
+                "email": "contato@padaria.example",
+                "phone": null,
+                "website": null,
+                "notes": null,
+                "custom_fields": [],
+                "is_active": true,
+                "logo_url": null,
+                "extra_emails": [],
+                "extra_phones": [],
+                "created_at": "2026-09-13T12:00:00+00:00",
+                "updated_at": "2026-09-13T12:00:00+00:00"
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "id": "00000000-0000-4000-8000-000000000003",
+          "external_id": "ERP 2001",
+          "name": "João da Silva",
+          "kind": "pf",
+          "legal_name": null,
+          "state_registration": null,
+          "municipal_registration": null,
+          "id_document": "MG-12.345.678 SSP/MG",
+          "document": "52998224725",
+          "email": "contato@padaria.example",
+          "phone": null,
+          "website": null,
+          "notes": null,
+          "custom_fields": [],
+          "is_active": true,
+          "logo_url": null,
+          "extra_emails": [],
+          "extra_phones": [],
+          "created_at": "2026-09-13T12:00:00+00:00",
+          "updated_at": "2026-09-13T12:00:00+00:00"
+        }
+      }
+    },
+    {
       "id": "customers.upsert/null_clears_field",
       "op": "customers.upsert",
       "args": {
@@ -1613,6 +1795,120 @@
           "summary": {
             "created": 0,
             "updated": 0,
+            "unchanged": 0,
+            "error": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "customers.batch/typed_fields",
+      "op": "customers.batch",
+      "args": {
+        "items": [
+          {
+            "external_id": "ERP 1042",
+            "kind": "pj",
+            "legal_name": "Estrela Panificação e Comércio Ltda",
+            "state_registration": "ISENTO",
+            "municipal_registration": "1.234.567-8"
+          },
+          {
+            "external_id": "ERP 2001",
+            "kind": "pf",
+            "name": "João da Silva",
+            "id_document": "MG-12.345.678 SSP/MG"
+          }
+        ]
+      },
+      "exchanges": [
+        {
+          "retry": false,
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/integration/customers/batch",
+            "query": {},
+            "body": {
+              "items": [
+                {
+                  "external_id": "ERP 1042",
+                  "kind": "pj",
+                  "legal_name": "Estrela Panificação e Comércio Ltda",
+                  "state_registration": "ISENTO",
+                  "municipal_registration": "1.234.567-8"
+                },
+                {
+                  "external_id": "ERP 2001",
+                  "kind": "pf",
+                  "name": "João da Silva",
+                  "id_document": "MG-12.345.678 SSP/MG"
+                }
+              ]
+            }
+          },
+          "response": {
+            "status": 200,
+            "headers": {},
+            "body": {
+              "code": 200,
+              "data": {
+                "results": [
+                  {
+                    "index": 0,
+                    "status": "updated",
+                    "external_id": "ERP 1042",
+                    "merged_into": null,
+                    "linked": false,
+                    "error": null,
+                    "code": null
+                  },
+                  {
+                    "index": 1,
+                    "status": "created",
+                    "external_id": "ERP 2001",
+                    "merged_into": null,
+                    "linked": false,
+                    "error": null,
+                    "code": null
+                  }
+                ],
+                "summary": {
+                  "created": 1,
+                  "updated": 1,
+                  "unchanged": 0,
+                  "error": 0
+                }
+              },
+              "message": "Executado com sucesso"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "result": {
+          "results": [
+            {
+              "index": 0,
+              "status": "updated",
+              "external_id": "ERP 1042",
+              "merged_into": null,
+              "linked": false,
+              "error": null,
+              "code": null
+            },
+            {
+              "index": 1,
+              "status": "created",
+              "external_id": "ERP 2001",
+              "merged_into": null,
+              "linked": false,
+              "error": null,
+              "code": null
+            }
+          ],
+          "summary": {
+            "created": 1,
+            "updated": 1,
             "unchanged": 0,
             "error": 0
           }

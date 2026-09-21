@@ -130,10 +130,18 @@ type CustomerBatchItem struct {
 	// ExternalID: id do cliente no seu sistema (obrigatório; qualquer texto — ex.:
 	// "erp-1042").
 	ExternalID string `json:"external_id" bfocus:"noclear"`
-	// Name: nome (até 500; obrigatório ao criar).
+	// Name: nome (até 500; obrigatório ao criar). Na PJ, o nome fantasia.
 	Name *string `json:"name,omitempty"`
 	// Document: CPF/CNPJ ou outro documento (até 50).
 	Document *string `json:"document,omitempty"`
+	// Kind, LegalName, StateRegistration, MunicipalRegistration, IDDocument: os mesmos de
+	// CustomerUpsertParams. Esta estrutura é separada daquela, então os campos precisam
+	// estar nas DUAS — na 0.2.3 só estavam lá, e o lote não os enviava.
+	Kind                  *string `json:"kind,omitempty"`
+	LegalName             *string `json:"legal_name,omitempty"`
+	StateRegistration     *string `json:"state_registration,omitempty"`
+	MunicipalRegistration *string `json:"municipal_registration,omitempty"`
+	IDDocument            *string `json:"id_document,omitempty"`
 	// Email: e-mail (até 255).
 	Email *string `json:"email,omitempty"`
 	// Phone: telefone (até 50).
